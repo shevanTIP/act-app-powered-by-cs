@@ -125,6 +125,9 @@ function reducer(state, action) {
     case "RESET_GENERATIONS":
       return { ...state, generationsUsed: 0 };
 
+    case "RESET_DEMO":
+      return { ...state, posts: action.payload, approvedPosts: [], discardedPosts: [], generationsUsed: action.payload.length };
+
     case "SET_GHL_CONFIG":
       return { ...state, ghlConfig: { ...state.ghlConfig, ...action.payload } };
 

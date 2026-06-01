@@ -1,5 +1,6 @@
 import { NavLink } from "react-router-dom";
-import { useApp } from "../context/AppContext";
+import { useApp, useToast } from "../context/AppContext";
+import { mockPosts } from "../lib/mockData";
 
 const tabs = [
   { to: "/onboarding",  label: "Setup" },
@@ -10,8 +11,14 @@ const tabs = [
 ];
 
 export default function Nav() {
-  const { state } = useApp();
+  const { state, dispatch } = useApp();
+  const { showToast } = useToast();
   const pendingCount = state.posts.filter(p => p.status === "pending").length;
+
+  const resetDemo = () => {
+    dispatch({ type: "RESET_DEMO", payload: mockPosts });
+    showToast("Demo reset — 3 posts restored.");
+  };
 
   return (
     <nav style={{
@@ -47,6 +54,25 @@ export default function Nav() {
         }}>
           ACT
         </span>
+      </div>
+
+      {/* Reset demo — centred */}
+      <div style={{ position: "absolute", left: "50%", transform: "translateX(-50%)" }}>
+        <button
+          onClick={resetDemo}
+          style={{
+            display: "flex", alignItems: "center", gap: 5,
+            background: "none", border: "1px dashed var(--border)",
+            borderRadius: 7, padding: "4px 12px", cursor: "pointer",
+            fontSize: 11, fontWeight: 500, color: "var(--muted)",
+            fontFamily: "'Inter', sans-serif", transition: "all 0.15s",
+          }}
+          onMouseEnter={e => { e.currentTarget.style.borderColor = "var(--electric)"; e.currentTarget.style.color = "var(--electric)"; }}
+          onMouseLeave={e => { e.currentTarget.style.borderColor = ""; e.currentTarget.style.color = ""; }}
+          title="Restore mock posts for demo"
+        >
+          ↺ Reset demo
+        </button>
       </div>
 
       {/* Tabs */}
