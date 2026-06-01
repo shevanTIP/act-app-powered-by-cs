@@ -91,7 +91,7 @@ export default function Queue() {
                   alignItems: "center",
                   gap: 8,
                   color: "var(--muted)",
-                  fontFamily: "'DM Sans', sans-serif",
+                  fontFamily: "'Inter', sans-serif",
                   transition: "background 0.15s",
                 }}
               >

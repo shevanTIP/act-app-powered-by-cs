@@ -66,7 +66,7 @@ export default function WeeklyUpdate() {
                 fontSize: 12,
                 fontWeight: 500,
                 cursor: "pointer",
-                fontFamily: "'DM Sans', sans-serif",
+                fontFamily: "'Inter', sans-serif",
                 border: selectedTags.includes(tag) ? "1px solid var(--electric)" : "1px solid rgba(255,255,255,0.2)",
                 background: selectedTags.includes(tag) ? "rgba(108,0,255,0.3)" : "rgba(255,255,255,0.08)",
                 color: selectedTags.includes(tag) ? "#D4AAFF" : "rgba(255,255,255,0.7)",

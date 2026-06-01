@@ -16,7 +16,7 @@ export default function PostCard({ post, actions, compact }) {
         position: "relative",
       }}>
         <p style={{
-          fontFamily: "'DM Serif Display', serif",
+          fontFamily: "'Space Grotesk', sans-serif",
           fontStyle: "italic",
           fontSize: compact ? 14 : 17,
           color: "white",

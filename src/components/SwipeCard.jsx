@@ -204,7 +204,7 @@ function SwipeCardItem({ post, index, isTop, animating }) {
       {/* Gradient header */}
       <div className={gradClass} style={{ height: 200, display: "flex", alignItems: "center", justifyContent: "center", padding: "20px 28px" }}>
         <p style={{
-          fontFamily: "'DM Serif Display', serif",
+          fontFamily: "'Space Grotesk', sans-serif",
           fontStyle: "italic",
           fontSize: 20,
           color: "white",

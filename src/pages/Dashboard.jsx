@@ -47,6 +47,11 @@ export default function Dashboard() {
           pointerEvents: "none",
         }} />
         <div style={{ position: "relative", zIndex: 1 }}>
+          <img
+            src="/brand/logo-white.png"
+            alt="The Ikigai Project"
+            style={{ height: 32, width: "auto", objectFit: "contain", marginBottom: 20, opacity: 0.9 }}
+          />
           <p className="label-eyebrow" style={{ color: "rgba(255,255,255,0.45)", marginBottom: 8 }}>
             {getDateRange()}
           </p>

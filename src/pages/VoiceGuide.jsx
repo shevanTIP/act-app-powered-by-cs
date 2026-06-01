@@ -39,7 +39,7 @@ export default function VoiceGuide() {
       <div className="card-dark" style={{ marginBottom: 20, position: "relative", overflow: "hidden" }}>
         <div style={{ position: "absolute", top: -60, right: -60, width: 200, height: 200, borderRadius: "50%", background: "radial-gradient(circle, rgba(108,0,255,0.2) 0%, transparent 70%)", pointerEvents: "none" }} />
         <span className="label-eyebrow" style={{ color: "rgba(255,255,255,0.4)" }}>Positioning Statement</span>
-        <p style={{ fontFamily: "'DM Serif Display', serif", fontStyle: "italic", fontSize: 20, color: "white", lineHeight: 1.5, marginTop: 12, position: "relative", zIndex: 1 }}>
+        <p style={{ fontFamily: "'Space Grotesk', sans-serif", fontStyle: "italic", fontSize: 20, color: "white", lineHeight: 1.5, marginTop: 12, position: "relative", zIndex: 1 }}>
           "{vg.positioning}"
         </p>
       </div>

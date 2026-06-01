@@ -3,7 +3,7 @@ export default function StatCard({ label, value, sub, accent }) {
     <div className="card" style={{ display: "flex", flexDirection: "column", gap: 8 }}>
       <span className="label-eyebrow">{label}</span>
       <span style={{
-        fontFamily: "'DM Serif Display', serif",
+        fontFamily: "'Space Grotesk', sans-serif",
         fontSize: 32,
         color: accent ? "var(--electric)" : "var(--ink)",
         lineHeight: 1.1,

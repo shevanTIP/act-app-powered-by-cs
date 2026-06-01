@@ -1,12 +1,12 @@
-import { NavLink, useLocation } from "react-router-dom";
+import { NavLink } from "react-router-dom";
 import { useApp } from "../context/AppContext";
 
 const tabs = [
-  { to: "/onboarding", label: "Setup" },
-  { to: "/dashboard",  label: "Dashboard" },
-  { to: "/queue",      label: "Queue", badge: true },
-  { to: "/voice-guide",label: "Voice Guide" },
-  { to: "/swipe",      label: "Review Posts" },
+  { to: "/onboarding",  label: "Setup" },
+  { to: "/dashboard",   label: "Dashboard" },
+  { to: "/queue",       label: "Queue", badge: true },
+  { to: "/voice-guide", label: "Voice Guide" },
+  { to: "/swipe",       label: "Review Posts" },
 ];
 
 export default function Nav() {
@@ -26,11 +26,27 @@ export default function Nav() {
       padding: "0 24px",
       gap: 0,
     }}>
-      {/* Logo */}
-      <div style={{ marginRight: "auto", display: "flex", alignItems: "center", gap: 2, flexShrink: 0 }}>
-        <span style={{ fontFamily: "'DM Serif Display', serif", fontSize: 18, color: "var(--ink)" }}>ACT</span>
-        <span style={{ color: "var(--electric)", fontSize: 18, margin: "0 2px" }}>·</span>
-        <span style={{ fontFamily: "'DM Sans', sans-serif", fontSize: 13, color: "var(--muted)", fontWeight: 500 }}>by TIP</span>
+      {/* Ikigai logo */}
+      <div style={{ marginRight: "auto", display: "flex", alignItems: "center", gap: 14, flexShrink: 0 }}>
+        <img
+          src="/brand/logo-black.png"
+          alt="The Ikigai Project"
+          style={{ height: 28, width: "auto", objectFit: "contain" }}
+        />
+        <div style={{
+          width: 1,
+          height: 20,
+          background: "var(--border)",
+        }} />
+        <span style={{
+          fontFamily: "'Space Grotesk', sans-serif",
+          fontSize: 13,
+          fontWeight: 600,
+          color: "var(--ink)",
+          letterSpacing: "0.04em",
+        }}>
+          ACT
+        </span>
       </div>
 
       {/* Tabs */}
@@ -48,7 +64,7 @@ export default function Nav() {
               fontSize: 13,
               fontWeight: 500,
               textDecoration: "none",
-              fontFamily: "'DM Sans', sans-serif",
+              fontFamily: "'Inter', sans-serif",
               background: isActive ? "var(--ink)" : "transparent",
               color: isActive ? "white" : "var(--muted)",
               transition: "all 0.15s",
@@ -71,6 +87,16 @@ export default function Nav() {
             )}
           </NavLink>
         ))}
+      </div>
+
+      {/* Powered by Cloudsprout */}
+      <div style={{ marginLeft: 20, display: "flex", alignItems: "center", gap: 6, flexShrink: 0 }}>
+        <span style={{ fontSize: 10, color: "var(--muted)", fontWeight: 500, letterSpacing: "0.04em" }}>powered by</span>
+        <img
+          src="/brand/cloudsprout.png"
+          alt="Cloudsprout"
+          style={{ height: 20, width: "auto", objectFit: "contain", opacity: 0.85 }}
+        />
       </div>
     </nav>
   );

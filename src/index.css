@@ -1,5 +1,27 @@
 @import "tailwindcss";
 
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Variable.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: normal;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Inter';
+  src: url('/fonts/Inter-Italic-Variable.ttf') format('truetype');
+  font-weight: 100 900;
+  font-style: italic;
+  font-display: swap;
+}
+@font-face {
+  font-family: 'Space Grotesk';
+  src: url('/fonts/SpaceGrotesk-Variable.ttf') format('truetype');
+  font-weight: 300 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 :root {
   --ink:       #380A65;
   --twilight:  #1B2D52;
@@ -14,7 +36,7 @@
 * { box-sizing: border-box; }
 
 body {
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   background-color: var(--off-white);
   color: var(--twilight);
   font-size: 15px;
@@ -23,7 +45,7 @@ body {
 }
 
 h1, h2, h3, h4 {
-  font-family: 'DM Serif Display', serif;
+  font-family: 'Space Grotesk', sans-serif;
   font-weight: 500;
   margin: 0;
 }
@@ -39,7 +61,7 @@ p { margin: 0; }
   text-transform: uppercase;
   letter-spacing: 2px;
   color: var(--muted);
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-weight: 500;
 }
 
@@ -63,7 +85,7 @@ p { margin: 0; }
   border: none;
   border-radius: 8px;
   padding: 12px 24px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -81,7 +103,7 @@ p { margin: 0; }
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 12px 24px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
@@ -100,7 +122,7 @@ select {
   border: 1px solid var(--border);
   border-radius: 8px;
   padding: 10px 14px;
-  font-family: 'DM Sans', sans-serif;
+  font-family: 'Inter', sans-serif;
   font-size: 14px;
   color: var(--twilight);
   width: 100%;
