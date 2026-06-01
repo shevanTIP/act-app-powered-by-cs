@@ -9,6 +9,7 @@ const defaultState = {
   approvedPosts: [],
   discardedPosts: [],
   weeklyUpdate: "",
+  weeklyEvents: [],        // [{ id, title, date, note }]
   generationsUsed: 3,
   generationsLimit: 20,
   ghlConfig: {
@@ -31,14 +32,36 @@ function reducer(state, action) {
   switch (action.type) {
     case "SET_VOICE_GUIDE":
       return { ...state, voiceGuide: action.payload };
+
     case "SET_WEEKLY_UPDATE":
       return { ...state, weeklyUpdate: action.payload };
+
+    // --- Weekly events ---
+    case "ADD_EVENT":
+      return { ...state, weeklyEvents: [...state.weeklyEvents, action.payload] };
+
+    case "UPDATE_EVENT":
+      return {
+        ...state,
+        weeklyEvents: state.weeklyEvents.map(e =>
+          e.id === action.payload.id ? { ...e, ...action.payload } : e
+        ),
+      };
+
+    case "REMOVE_EVENT":
+      return { ...state, weeklyEvents: state.weeklyEvents.filter(e => e.id !== action.payload) };
+
+    case "CLEAR_EVENTS":
+      return { ...state, weeklyEvents: [] };
+
+    // --- Posts ---
     case "ADD_POSTS":
       return {
         ...state,
         posts: [...state.posts, ...action.payload],
         generationsUsed: state.generationsUsed + action.payload.length,
       };
+
     case "APPROVE_POST": {
       const post = state.posts.find(p => p.id === action.payload);
       if (!post) return state;
@@ -48,15 +71,20 @@ function reducer(state, action) {
         approvedPosts: [...state.approvedPosts, { ...post, status: "approved", approvedAt: Date.now() }],
       };
     }
+
     case "DISCARD_POST": {
       const post = state.posts.find(p => p.id === action.payload);
       if (!post) return state;
       return {
         ...state,
         posts: state.posts.filter(p => p.id !== action.payload),
-        discardedPosts: [...state.discardedPosts, { ...post, status: "discarded", discardedAt: Date.now() }],
+        discardedPosts: [
+          ...state.discardedPosts,
+          { ...post, status: "discarded", discardedAt: Date.now() },
+        ],
       };
     }
+
     case "RESTORE_POST": {
       const post = state.discardedPosts.find(p => p.id === action.payload);
       if (!post) return state;
@@ -66,29 +94,42 @@ function reducer(state, action) {
         posts: [...state.posts, { ...post, status: "pending", discardedAt: undefined }],
       };
     }
+
+    case "DELETE_DISCARDED":
+      return { ...state, discardedPosts: state.discardedPosts.filter(p => p.id !== action.payload) };
+
+    case "CLEAR_DISCARDED":
+      return { ...state, discardedPosts: [] };
+
     case "UPDATE_POST_CAPTION": {
-      const updateInList = (list) => list.map(p => p.id === action.payload.id ? { ...p, caption: action.payload.caption } : p);
+      const updateInList = (list) =>
+        list.map(p => p.id === action.payload.id ? { ...p, caption: action.payload.caption } : p);
       return {
         ...state,
         posts: updateInList(state.posts),
         approvedPosts: updateInList(state.approvedPosts),
       };
     }
-    case "REPLACE_POST": {
+
+    case "REPLACE_POST":
       return {
         ...state,
         posts: state.posts.map(p => p.id === action.payload.id ? action.payload : p),
         generationsUsed: state.generationsUsed + 1,
       };
-    }
+
     case "RESET_GENERATIONS":
       return { ...state, generationsUsed: 0 };
+
     case "SET_GHL_CONFIG":
       return { ...state, ghlConfig: { ...state.ghlConfig, ...action.payload } };
+
     case "MARK_SCHEDULED": {
-      const updateInList = (list) => list.map(p => p.id === action.payload ? { ...p, status: "scheduled" } : p);
+      const updateInList = (list) =>
+        list.map(p => p.id === action.payload ? { ...p, status: "scheduled" } : p);
       return { ...state, approvedPosts: updateInList(state.approvedPosts) };
     }
+
     default:
       return state;
   }
