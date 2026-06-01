@@ -58,13 +58,24 @@ function reducer(state, action) {
     case "SET_PLATFORM_PREFS":
       return { ...state, platformPrefs: action.payload };
 
+    case "SET_POST_PLATFORMS": {
+      const { id, platforms } = action.payload;
+      const update = list => list.map(p => p.id === id ? { ...p, platforms } : p);
+      return { ...state, posts: update(state.posts), approvedPosts: update(state.approvedPosts) };
+    }
+
     // --- Posts ---
-    case "ADD_POSTS":
+    case "ADD_POSTS": {
+      const normalized = action.payload.map(p => ({
+        ...p,
+        platforms: p.platforms || [p.platform],
+      }));
       return {
         ...state,
-        posts: [...state.posts, ...action.payload],
-        generationsUsed: state.generationsUsed + action.payload.length,
+        posts: [...state.posts, ...normalized],
+        generationsUsed: state.generationsUsed + normalized.length,
       };
+    }
 
     case "APPROVE_POST": {
       const post = state.posts.find(p => p.id === action.payload);
