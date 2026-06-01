@@ -2,7 +2,7 @@ import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp, useToast } from "../context/AppContext";
 import PostCard, { StatusBadge } from "../components/PostCard";
-import { BUCKET_GRADIENTS, PLATFORM_ICONS } from "../lib/mockData";
+import { BUCKET_GRADIENTS, PLATFORM_ICONS, ALL_PLATFORMS } from "../lib/mockData";
 import { GHL_INTEGRATION } from "../lib/anthropic";
 
 const DAYS = ["Monday", "Wednesday", "Thursday", "Friday"];
@@ -53,9 +53,48 @@ export default function Queue() {
 
   return (
     <div style={{ maxWidth: 1000, margin: "0 auto", padding: "40px 24px 80px" }}>
-      <div style={{ marginBottom: 28 }}>
-        <span className="label-eyebrow">Content Queue</span>
-        <h2 style={{ color: "var(--ink)", marginTop: 6 }}>This Week's Schedule</h2>
+      <div style={{ display: "flex", alignItems: "flex-start", justifyContent: "space-between", marginBottom: 28, gap: 20, flexWrap: "wrap" }}>
+        <div>
+          <span className="label-eyebrow">Content Queue</span>
+          <h2 style={{ color: "var(--ink)", marginTop: 6 }}>This Week's Schedule</h2>
+        </div>
+
+        {/* Platform selector */}
+        <div className="card" style={{ padding: "14px 18px", display: "flex", alignItems: "center", gap: 14, flexWrap: "wrap" }}>
+          <span style={{ fontSize: 11, fontWeight: 600, color: "var(--muted)", textTransform: "uppercase", letterSpacing: "1.5px", whiteSpace: "nowrap" }}>Schedule to</span>
+          <div style={{ display: "flex", flexWrap: "wrap", gap: 6 }}>
+            {ALL_PLATFORMS.map(p => {
+              const active = (state.platformPrefs || []).includes(p);
+              const isLast = active && (state.platformPrefs || []).length === 1;
+              return (
+                <button
+                  key={p}
+                  onClick={() => {
+                    const current = state.platformPrefs || [];
+                    if (current.includes(p) && current.length === 1) return;
+                    const next = current.includes(p) ? current.filter(x => x !== p) : [...current, p];
+                    dispatch({ type: "SET_PLATFORM_PREFS", payload: next });
+                  }}
+                  title={isLast ? "At least one platform required" : ""}
+                  style={{
+                    display: "flex", alignItems: "center", gap: 5,
+                    padding: "5px 12px", borderRadius: 20, fontSize: 12, fontWeight: 500,
+                    cursor: isLast ? "not-allowed" : "pointer",
+                    fontFamily: "'Inter', sans-serif",
+                    border: active ? "1px solid var(--electric)" : "1px solid var(--border)",
+                    background: active ? "rgba(108,0,255,0.08)" : "transparent",
+                    color: active ? "var(--electric)" : "var(--muted)",
+                    transition: "all 0.15s",
+                    opacity: isLast ? 0.5 : 1,
+                  }}
+                >
+                  <span>{PLATFORM_ICONS[p]}</span>
+                  {p}
+                </button>
+              );
+            })}
+          </div>
+        </div>
       </div>
 
       {/* Week schedule strip */}

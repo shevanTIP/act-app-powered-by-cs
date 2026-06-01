@@ -1,7 +1,6 @@
 import { useState } from "react";
 import { useApp, useToast } from "../context/AppContext";
 import { generatePosts } from "../lib/anthropic";
-import { ALL_PLATFORMS, PLATFORM_ICONS } from "../lib/mockData";
 
 const OCCASION_TAGS = [
   "New client", "Launch", "Milestone", "Industry take", "Seasonal", "Behind the scenes",
@@ -99,13 +98,6 @@ export default function WeeklyUpdate() {
     setAddingEvent(false);
   };
 
-  const togglePlatform = (p) => {
-    const current = state.platformPrefs || [];
-    if (current.includes(p) && current.length === 1) return; // keep at least one
-    const next = current.includes(p) ? current.filter(x => x !== p) : [...current, p];
-    dispatch({ type: "SET_PLATFORM_PREFS", payload: next });
-  };
-
   const handleGenerate = async () => {
     if (!canGenerate) return;
     setLoading(true);
@@ -167,43 +159,6 @@ export default function WeeklyUpdate() {
               {tag}
             </button>
           ))}
-        </div>
-
-        {/* Platform selector */}
-        <div style={{ marginBottom: 20 }}>
-          <div style={{ marginBottom: 10 }}>
-            <span style={{ fontSize: 12, fontWeight: 600, color: "rgba(255,255,255,0.6)", textTransform: "uppercase", letterSpacing: "1.5px" }}>
-              Platforms
-            </span>
-            <span style={{ marginLeft: 8, fontSize: 11, color: "rgba(255,255,255,0.3)" }}>Posts will be generated for the selected platforms</span>
-          </div>
-          <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
-            {ALL_PLATFORMS.map(p => {
-              const active = (state.platformPrefs || []).includes(p);
-              const isLast = active && (state.platformPrefs || []).length === 1;
-              return (
-                <button
-                  key={p}
-                  onClick={() => togglePlatform(p)}
-                  title={isLast ? "At least one platform must be selected" : ""}
-                  style={{
-                    display: "flex", alignItems: "center", gap: 6,
-                    padding: "6px 14px", borderRadius: 20, fontSize: 13, fontWeight: 500,
-                    cursor: isLast ? "not-allowed" : "pointer",
-                    fontFamily: "'Inter', sans-serif",
-                    border: active ? "1px solid var(--electric)" : "1px solid rgba(255,255,255,0.2)",
-                    background: active ? "rgba(108,0,255,0.35)" : "rgba(255,255,255,0.07)",
-                    color: active ? "#D4AAFF" : "rgba(255,255,255,0.55)",
-                    transition: "all 0.15s",
-                    opacity: isLast ? 0.6 : 1,
-                  }}
-                >
-                  <span style={{ fontSize: 14 }}>{PLATFORM_ICONS[p]}</span>
-                  {p}
-                </button>
-              );
-            })}
-          </div>
         </div>
 
         {/* Weekly events */}
