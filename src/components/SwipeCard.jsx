@@ -94,7 +94,7 @@ export default function SwipeStack() {
 
       {/* Pending count */}
       <p style={{ textAlign: "center", fontSize: 13, color: "var(--muted)", marginBottom: 20 }}>
-        {pending.length} post{pending.length !== 1 ? "s" : ""} awaiting review
+        {pending.length} post{pending.length !== 1 ? "s" : ""} selected
       </p>
 
       {/* Actions */}
