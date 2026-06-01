@@ -1,4 +1,4 @@
-export async function generatePosts({ voiceGuide, weeklyUpdate, count = 4 }) {
+export async function generatePosts({ voiceGuide, weeklyUpdate, platforms, count = 4 }) {
   const apiKey = import.meta.env.VITE_ANTHROPIC_API_KEY;
   if (!apiKey) throw new Error("VITE_ANTHROPIC_API_KEY is not set in your .env file.");
 
@@ -14,7 +14,7 @@ export async function generatePosts({ voiceGuide, weeklyUpdate, count = 4 }) {
       model: "claude-sonnet-4-20250514",
       max_tokens: 2000,
       system: buildSystemPrompt(voiceGuide),
-      messages: [{ role: "user", content: buildUserPrompt(weeklyUpdate, count) }],
+      messages: [{ role: "user", content: buildUserPrompt(weeklyUpdate, platforms, count) }],
     }),
   });
 
@@ -25,14 +25,14 @@ export async function generatePosts({ voiceGuide, weeklyUpdate, count = 4 }) {
 
   const data = await response.json();
   const text = data.content[0].text;
-
   const cleaned = text.replace(/```json\n?/g, "").replace(/```\n?/g, "").trim();
   return JSON.parse(cleaned);
 }
 
-export async function regeneratePost({ voiceGuide, existingPost }) {
+export async function regeneratePost({ voiceGuide, existingPost, platforms }) {
   const posts = await generatePosts({
     voiceGuide,
+    platforms: platforms || [existingPost.platform],
     weeklyUpdate: `Generate a fresh angle on this bucket: "${existingPost.bucket}". The previous post was: "${existingPost.caption}". Try a completely different hook and angle.`,
     count: 1,
   });
@@ -71,15 +71,25 @@ PREFERRED WORDS: ${vg.reachWords}
 Always respond with ONLY valid JSON — no preamble, no markdown fences.`;
 }
 
-function buildUserPrompt(weeklyUpdate, count) {
+function buildUserPrompt(weeklyUpdate, platforms, count) {
+  const platformList = (platforms && platforms.length)
+    ? platforms.join(" | ")
+    : "Instagram | LinkedIn | X";
+
+  const platformNote = platforms && platforms.length === 1
+    ? `All posts must be for ${platforms[0]}.`
+    : `Distribute the posts across these platforms (use each at least once if possible): ${platformList}.`;
+
   return `Generate ${count} social media post${count > 1 ? 's' : ''} for this week.
 ${weeklyUpdate ? `Context: ${weeklyUpdate}` : ''}
+
+${platformNote}
 
 Return a JSON array of ${count} post object${count > 1 ? 's' : ''}. Each object must have exactly these fields:
 {
   "id": "unique string like post-uuid",
   "bucket": "one of: Talent → Business | Real Access | Behind the Process | Infrastructure | Industry Take",
-  "platform": "one of: Instagram | LinkedIn | X",
+  "platform": "one of: ${platformList}",
   "caption": "the full post copy (2–4 sentences, on-brand voice, no hashtags)",
   "pullQuote": "a short punchy pull quote from the caption (max 12 words)",
   "scheduledDay": "one of: Monday | Wednesday | Thursday | Friday",
@@ -89,15 +99,9 @@ Return a JSON array of ${count} post object${count > 1 ? 's' : ''}. Each object 
 }
 
 // GHL Integration placeholder — wire up after backend handoff
-// POST approved post data to GHL Social Planner via:
-// POST https://rest.gohighlevel.com/v1/social-media-posting/
-// Headers: Authorization: Bearer {GHL_API_KEY}
-// Body: { locationId, title, caption, platforms, scheduledAt }
 export const GHL_INTEGRATION = {
   pushToGHL: async (post, ghlConfig) => {
     console.log("[GHL] Placeholder — post to be scheduled:", post, ghlConfig);
-    // TODO: implement after backend handoff
-    // const res = await fetch('https://services.leadconnectorhq.com/social-media-posting/...', {...})
     throw new Error("GHL integration not yet configured. Add locationId and API key in Settings.");
   },
 };

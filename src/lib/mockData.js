@@ -71,7 +71,13 @@ export const PLATFORM_ICONS = {
   Instagram: "📸",
   LinkedIn: "💼",
   X: "✦",
+  Facebook: "🔵",
+  TikTok: "🎵",
 };
+
+export const ALL_PLATFORMS = ["Instagram", "LinkedIn", "X", "Facebook", "TikTok"];
+
+export const DEFAULT_PLATFORMS = ["Instagram", "LinkedIn", "X"];
 
 export const GHL_PLACEHOLDER = {
   connected: false,

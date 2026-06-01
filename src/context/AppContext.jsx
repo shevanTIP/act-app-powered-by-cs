@@ -1,5 +1,5 @@
 import { createContext, useContext, useEffect, useReducer, useCallback, useRef } from "react";
-import { defaultVoiceGuide, mockPosts } from "../lib/mockData";
+import { defaultVoiceGuide, mockPosts, DEFAULT_PLATFORMS } from "../lib/mockData";
 
 const STORAGE_KEY = "act_app_state";
 
@@ -9,7 +9,8 @@ const defaultState = {
   approvedPosts: [],
   discardedPosts: [],
   weeklyUpdate: "",
-  weeklyEvents: [],        // [{ id, title, date, note }]
+  weeklyEvents: [],
+  platformPrefs: DEFAULT_PLATFORMS,   // which platforms to generate for
   generationsUsed: 3,
   generationsLimit: 20,
   ghlConfig: {
@@ -53,6 +54,9 @@ function reducer(state, action) {
 
     case "CLEAR_EVENTS":
       return { ...state, weeklyEvents: [] };
+
+    case "SET_PLATFORM_PREFS":
+      return { ...state, platformPrefs: action.payload };
 
     // --- Posts ---
     case "ADD_POSTS":

@@ -46,7 +46,7 @@ export default function SwipeStack() {
     if (remaining < 1) { showToast("Generation limit reached.", "error"); return; }
     setRegenerating(true);
     try {
-      const newPost = await regeneratePost({ voiceGuide: state.voiceGuide, existingPost: topPost });
+      const newPost = await regeneratePost({ voiceGuide: state.voiceGuide, existingPost: topPost, platforms: state.platformPrefs });
       dispatch({ type: "REPLACE_POST", payload: { ...newPost, id: topPost.id } });
       showToast("New angle generated.");
     } catch (err) {
