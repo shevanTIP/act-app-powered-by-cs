@@ -35,6 +35,7 @@ export const mockPosts = [
     pullQuote: "Most people aren't underqualified. They're just understructured.",
     scheduledDay: "Monday",
     scheduledTime: "10:00 AM",
+    format: "image",
     status: "pending",
   },
   {
@@ -45,6 +46,7 @@ export const mockPosts = [
     pullQuote: "We're not theorizing. We're operating.",
     scheduledDay: "Wednesday",
     scheduledTime: "12:00 PM",
+    format: "video",
     status: "pending",
   },
   {
@@ -55,9 +57,18 @@ export const mockPosts = [
     pullQuote: "One point of contact. Full accountability.",
     scheduledDay: "Friday",
     scheduledTime: "3:00 PM",
+    format: "reel",
     status: "pending",
   },
 ];
+
+export const ASSET_TYPES = ["Logo", "Face", "Mascot", "Style Ref", "Product"];
+
+export const FORMAT_ICONS = {
+  image: "🖼",
+  video: "🎬",
+  reel:  "🎵",
+};
 
 export const BUCKET_GRADIENTS = {
   "Talent → Business": "bucket-talent",

@@ -10,7 +10,8 @@ const defaultState = {
   discardedPosts: [],
   weeklyUpdate: "",
   weeklyEvents: [],
-  platformPrefs: DEFAULT_PLATFORMS,   // which platforms to generate for
+  platformPrefs: DEFAULT_PLATFORMS,
+  assets: [],                          // [{ id, type, label, usageNote, dataUrl, fileName }]
   generationsUsed: 3,
   generationsLimit: 20,
   ghlConfig: {
@@ -57,6 +58,14 @@ function reducer(state, action) {
 
     case "SET_PLATFORM_PREFS":
       return { ...state, platformPrefs: action.payload };
+
+    // --- Assets ---
+    case "ADD_ASSET":
+      return { ...state, assets: [...state.assets, action.payload] };
+    case "UPDATE_ASSET":
+      return { ...state, assets: state.assets.map(a => a.id === action.payload.id ? { ...a, ...action.payload } : a) };
+    case "DELETE_ASSET":
+      return { ...state, assets: state.assets.filter(a => a.id !== action.payload) };
 
     case "SET_POST_PLATFORMS": {
       const { id, platforms } = action.payload;

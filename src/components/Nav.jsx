@@ -6,6 +6,7 @@ const tabs = [
   { to: "/onboarding",  label: "Setup" },
   { to: "/dashboard",   label: "Dashboard" },
   { to: "/queue",       label: "Queue", badge: true },
+  { to: "/assets",      label: "Assets" },
   { to: "/voice-guide", label: "Voice Guide" },
   { to: "/swipe",       label: "Review Posts" },
 ];

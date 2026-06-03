@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { BUCKET_GRADIENTS, PLATFORM_ICONS } from "../lib/mockData";
+import { BUCKET_GRADIENTS, PLATFORM_ICONS, FORMAT_ICONS } from "../lib/mockData";
 import { useApp, useToast } from "../context/AppContext";
 import { regeneratePost } from "../lib/anthropic";
 
@@ -46,7 +46,7 @@ export default function SwipeStack() {
     if (remaining < 1) { showToast("Generation limit reached.", "error"); return; }
     setRegenerating(true);
     try {
-      const newPost = await regeneratePost({ voiceGuide: state.voiceGuide, existingPost: topPost, platforms: state.platformPrefs });
+      const newPost = await regeneratePost({ voiceGuide: state.voiceGuide, existingPost: topPost, platforms: state.platformPrefs, assets: state.assets || [] });
       dispatch({ type: "REPLACE_POST", payload: { ...newPost, id: topPost.id } });
       showToast("New angle generated.");
     } catch (err) {
@@ -220,7 +220,14 @@ function SwipeCardItem({ post, index, isTop, animating }) {
       <div style={{ padding: "20px 24px" }}>
         <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 12 }}>
           <span className="label-eyebrow" style={{ color: "var(--electric)" }}>{post.bucket}</span>
-          <span style={{ fontSize: 13, color: "var(--muted)" }}>{icon} {post.platform}</span>
+          <div style={{ display: "flex", alignItems: "center", gap: 8 }}>
+            {post.format && (
+              <span style={{ fontSize: 11, fontWeight: 600, padding: "2px 8px", borderRadius: 8, background: "var(--off-white)", color: "var(--muted)" }}>
+                {FORMAT_ICONS[post.format]} {post.format}
+              </span>
+            )}
+            <span style={{ fontSize: 13, color: "var(--muted)" }}>{icon} {post.platform}</span>
+          </div>
         </div>
         <p style={{ fontSize: 14, color: "var(--twilight)", lineHeight: 1.7, marginBottom: 16 }}>
           {post.caption}

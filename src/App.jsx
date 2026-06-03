@@ -7,6 +7,7 @@ import Onboarding from "./pages/Onboarding";
 import Queue from "./pages/Queue";
 import SwipeReview from "./pages/SwipeReview";
 import VoiceGuide from "./pages/VoiceGuide";
+import Assets from "./pages/Assets";
 
 export default function App() {
   return (
@@ -15,12 +16,13 @@ export default function App() {
         <Nav />
         <main>
           <Routes>
-            <Route path="/" element={<Navigate to="/dashboard" replace />} />
-            <Route path="/dashboard"  element={<Dashboard />} />
-            <Route path="/onboarding" element={<Onboarding />} />
-            <Route path="/queue"      element={<Queue />} />
-            <Route path="/swipe"      element={<SwipeReview />} />
-            <Route path="/voice-guide" element={<VoiceGuide />} />
+            <Route path="/"             element={<Navigate to="/dashboard" replace />} />
+            <Route path="/dashboard"    element={<Dashboard />} />
+            <Route path="/onboarding"   element={<Onboarding />} />
+            <Route path="/queue"        element={<Queue />} />
+            <Route path="/swipe"        element={<SwipeReview />} />
+            <Route path="/voice-guide"  element={<VoiceGuide />} />
+            <Route path="/assets"       element={<Assets />} />
           </Routes>
         </main>
         <Toast />

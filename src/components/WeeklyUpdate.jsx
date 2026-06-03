@@ -113,6 +113,7 @@ export default function WeeklyUpdate() {
         voiceGuide: state.voiceGuide,
         weeklyUpdate: parts.join("\n\n"),
         platforms: state.platformPrefs,
+        assets: state.assets || [],
         count: 4,
       });
       dispatch({ type: "ADD_POSTS", payload: posts });

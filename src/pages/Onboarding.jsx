@@ -1,8 +1,9 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { useApp, useToast } from "../context/AppContext";
+import { scrapeAndFillVoiceGuide } from "../lib/anthropic";
 
-const SECTIONS = ["Brand Core","Positioning","Audience","Voice","Pillars","Content","Words","Bio & CTAs"];
+const SECTIONS = ["Scan Site","Brand Core","Positioning","Audience","Voice","Pillars","Content","Words","Bio & CTAs"];
 
 const SOUND_LIKE_OPTIONS = ["Knowledgeable","Direct","Confident","Sharp","Witty","Warm","Empathetic","Playful","Authoritative","Humble","Bold","Clear"];
 const NOT_SOUND_LIKE_OPTIONS = ["A guru","A hype machine","A motivational poster","A salesperson","A life coach","Corporate","Vague","Preachy"];
@@ -15,10 +16,29 @@ function TextArea({ value, onChange, placeholder, rows = 3 }) {
   return <textarea value={value} onChange={e => onChange(e.target.value)} placeholder={placeholder || ""} rows={rows} />;
 }
 
-function QuizCard({ label, question, children }) {
+const CONFIDENCE_STYLES = {
+  high:     { bg: "rgba(0,165,80,0.08)",    color: "#007040", label: "✓ Confirmed" },
+  inferred: { bg: "rgba(224,160,32,0.12)",  color: "#9A6400", label: "~ Inferred — review" },
+  missing:  { bg: "rgba(150,150,150,0.08)", color: "var(--muted)", label: "○ Not found" },
+};
+
+function ConfidenceBadge({ confidence }) {
+  if (!confidence) return null;
+  const s = CONFIDENCE_STYLES[confidence] || CONFIDENCE_STYLES.missing;
   return (
-    <div className="card" style={{ marginBottom: 14 }}>
-      <span className="label-eyebrow" style={{ display: "block", marginBottom: 8 }}>{label}</span>
+    <span style={{ fontSize: 10, fontWeight: 600, padding: "2px 8px", borderRadius: 8, background: s.bg, color: s.color, marginLeft: 8 }}>
+      {s.label}
+    </span>
+  );
+}
+
+function QuizCard({ label, question, confidence, children }) {
+  return (
+    <div className="card" style={{ marginBottom: 14, borderColor: confidence === "missing" ? "var(--border)" : confidence === "high" ? "rgba(0,165,80,0.25)" : confidence === "inferred" ? "rgba(224,160,32,0.3)" : "var(--border)" }}>
+      <div style={{ display: "flex", alignItems: "center", marginBottom: 8 }}>
+        <span className="label-eyebrow">{label}</span>
+        <ConfidenceBadge confidence={confidence} />
+      </div>
       <p style={{ fontSize: 14, color: "var(--twilight)", marginBottom: 14, fontWeight: 500 }}>{question}</p>
       {children}
     </div>
@@ -66,8 +86,40 @@ export default function Onboarding() {
   const { showToast } = useToast();
   const navigate = useNavigate();
   const [activeSection, setActiveSection] = useState(0);
-
   const [form, setForm] = useState({ ...state.voiceGuide });
+  const [confidence, setConfidence] = useState({});
+
+  // Website scanner state
+  const [siteUrl, setSiteUrl] = useState("");
+  const [scanning, setScanning] = useState(false);
+  const [scanDone, setScanDone] = useState(false);
+
+  const handleScan = async () => {
+    if (!siteUrl.trim()) return;
+    setScanning(true);
+    try {
+      const url = siteUrl.startsWith("http") ? siteUrl : `https://${siteUrl}`;
+      const result = await scrapeAndFillVoiceGuide(url);
+      // result is { fieldName: { value, confidence } }
+      const newForm = { ...form };
+      const newConfidence = {};
+      Object.entries(result).forEach(([key, data]) => {
+        if (data.value !== undefined && data.value !== "" && data.value !== null) {
+          newForm[key] = data.value;
+        }
+        if (data.confidence) newConfidence[key] = data.confidence;
+      });
+      setForm(newForm);
+      setConfidence(newConfidence);
+      setScanDone(true);
+      showToast("Site scanned — review and edit each section.");
+      setActiveSection(1); // jump to first real section
+    } catch (err) {
+      showToast(err.message || "Scan failed. Check the URL and try again.", "error");
+    } finally {
+      setScanning(false);
+    }
+  };
 
   const set = (key) => (val) => setForm(f => ({ ...f, [key]: val }));
   const toggleChip = (key) => (val) => {
@@ -126,74 +178,114 @@ export default function Onboarding() {
         ))}
       </div>
 
-      {/* Section: Brand Core */}
+      {/* Section 0: Website Scanner */}
       {activeSection === 0 && (
         <div className="animate-fade-in-up">
-          <QuizCard label="Q1 · Brand Core" question="What is the name of the business or personal brand?">
+          <div className="card-dark" style={{ marginBottom: 20, position: "relative", overflow: "hidden" }}>
+            <div style={{ position: "absolute", top: -50, right: -50, width: 180, height: 180, borderRadius: "50%", background: "radial-gradient(circle, rgba(108,0,255,0.2) 0%, transparent 70%)", pointerEvents: "none" }} />
+            <div style={{ position: "relative", zIndex: 1 }}>
+              <span className="label-eyebrow" style={{ color: "rgba(255,255,255,0.45)" }}>Optional — saves you time</span>
+              <h3 style={{ color: "white", margin: "8px 0 10px" }}>Have an existing website?</h3>
+              <p style={{ fontSize: 13, color: "rgba(255,255,255,0.55)", marginBottom: 20, lineHeight: 1.6 }}>
+                Drop your URL and the AI will read your site and pre-fill the guide as best it can.
+                You'll review and fix anything that's off.
+              </p>
+              <div style={{ display: "flex", gap: 10 }}>
+                <input
+                  type="text"
+                  value={siteUrl}
+                  onChange={e => setSiteUrl(e.target.value)}
+                  onKeyDown={e => e.key === "Enter" && handleScan()}
+                  placeholder="yoursite.com"
+                  style={{ background: "rgba(255,255,255,0.1)", border: "1px solid rgba(255,255,255,0.2)", color: "white", flex: 1 }}
+                />
+                <button className="btn-primary" onClick={handleScan} disabled={scanning || !siteUrl.trim()} style={{ flexShrink: 0 }}>
+                  {scanning ? "Scanning…" : "Scan my site"}
+                </button>
+              </div>
+              {scanDone && (
+                <p style={{ fontSize: 12, color: "rgba(150,255,150,0.8)", marginTop: 12 }}>
+                  ✓ Guide pre-filled — step through the sections and edit anything that needs fixing.
+                </p>
+              )}
+            </div>
+          </div>
+
+          <div className="card" style={{ textAlign: "center", padding: "24px 20px" }}>
+            <p style={{ fontSize: 14, color: "var(--muted)", marginBottom: 16 }}>No website, or prefer to fill it in manually?</p>
+            <button className="btn-ghost" onClick={() => setActiveSection(1)}>Fill in manually →</button>
+          </div>
+        </div>
+      )}
+
+      {/* Section 1: Brand Core */}
+      {activeSection === 1 && (
+        <div className="animate-fade-in-up">
+          <QuizCard label="Q1 · Brand Core" question="What is the name of the business or personal brand?" confidence={confidence.brandName}>
             <TextInput value={form.brandName || ""} onChange={set("brandName")} placeholder="e.g. The Ikigai Project" />
           </QuizCard>
-          <QuizCard label="Q2 · Brand Core" question="Beyond the product, what are you really selling?">
+          <QuizCard label="Q2 · Brand Core" question="Beyond the product, what are you really selling?" confidence={confidence.reallySelling}>
             <TextArea value={form.reallySelling || ""} onChange={set("reallySelling")} placeholder="The deeper value, the transformation, the feeling…" />
           </QuizCard>
-          <QuizCard label="Q3 · Brand Core" question="In one sentence, what do you actually deliver for clients?">
+          <QuizCard label="Q3 · Brand Core" question="In one sentence, what do you actually deliver for clients?" confidence={confidence.delivers}>
             <TextInput value={form.delivers || ""} onChange={set("delivers")} placeholder="Business growth and infrastructure systems for…" />
           </QuizCard>
-          <QuizCard label="Q4 · Brand Core" question="What are you explicitly NOT selling?">
+          <QuizCard label="Q4 · Brand Core" question="What are you explicitly NOT selling?" confidence={confidence.notSelling}>
             <TextArea value={form.notSelling || ""} onChange={set("notSelling")} placeholder="Not hustle culture. No results-guarantee hype…" />
           </QuizCard>
-          <QuizCard label="Q5 · Brand Core" question="When someone finishes working with you, how should they feel?">
+          <QuizCard label="Q5 · Brand Core" question="When someone finishes working with you, how should they feel?" confidence={confidence.clientFeeling}>
             <TextArea value={form.clientFeeling || ""} onChange={set("clientFeeling")} placeholder="Informed. Safe. Clear-headed…" />
           </QuizCard>
         </div>
       )}
 
-      {/* Section: Positioning */}
-      {activeSection === 1 && (
+      {/* Section 2: Positioning */}
+      {activeSection === 2 && (
         <div className="animate-fade-in-up">
-          <QuizCard label="Q6 · Positioning" question="Write your core positioning statement in one sentence.">
+          <QuizCard label="Q6 · Positioning" question="Write your core positioning statement in one sentence." confidence={confidence.positioning}>
             <TextArea value={form.positioning || ""} onChange={set("positioning")} rows={2} />
           </QuizCard>
-          <QuizCard label="Q7 · Positioning" question="What is the single biggest differentiator from competitors?">
+          <QuizCard label="Q7 · Positioning" question="What is the single biggest differentiator from competitors?" confidence={confidence.differentiator}>
             <TextArea value={form.differentiator || ""} onChange={set("differentiator")} />
           </QuizCard>
         </div>
       )}
 
-      {/* Section: Audience */}
-      {activeSection === 2 && (
+      {/* Section 3: Audience */}
+      {activeSection === 3 && (
         <div className="animate-fade-in-up">
-          <QuizCard label="Q8 · Audience" question="Who is the primary audience for this brand?">
+          <QuizCard label="Q8 · Audience" question="Who is the primary audience for this brand?" confidence={confidence.audience}>
             <TextArea value={form.audience || ""} onChange={set("audience")} />
           </QuizCard>
-          <QuizCard label="Q9 · Audience" question="What does your audience care about most when choosing you?">
+          <QuizCard label="Q9 · Audience" question="What does your audience care about most when choosing you?" confidence={confidence.audienceCares}>
             <TextArea value={form.audienceCares || ""} onChange={set("audienceCares")} />
           </QuizCard>
-          <QuizCard label="Q10 · Audience" question="Who is this brand NOT for?">
+          <QuizCard label="Q10 · Audience" question="Who is this brand NOT for?" confidence={confidence.notFor}>
             <TextArea value={form.notFor || ""} onChange={set("notFor")} />
           </QuizCard>
         </div>
       )}
 
-      {/* Section: Voice */}
-      {activeSection === 3 && (
+      {/* Section 4: Voice */}
+      {activeSection === 4 && (
         <div className="animate-fade-in-up">
-          <QuizCard label="Q11 · Brand Voice" question="Rate your brand's voice on each dimension (0–10).">
+          <QuizCard label="Q11 · Brand Voice" question="Rate your brand's voice on each dimension (0–10)." confidence={confidence.toneSliders}>
             <ToneSliders value={form.toneSliders || {}} onChange={set("toneSliders")} />
           </QuizCard>
-          <QuizCard label="Q12 · Brand Voice" question='Your brand should sound like…'>
+          <QuizCard label="Q12 · Brand Voice" question="Your brand should sound like…" confidence={confidence.soundLike}>
             <MultiChips options={SOUND_LIKE_OPTIONS} selected={form.soundLike || []} onToggle={toggleChip("soundLike")} />
           </QuizCard>
-          <QuizCard label="Q13 · Brand Voice" question='Your brand should NOT sound like…'>
+          <QuizCard label="Q13 · Brand Voice" question="Your brand should NOT sound like…" confidence={confidence.notSoundLike}>
             <MultiChips options={NOT_SOUND_LIKE_OPTIONS} selected={form.notSoundLike || []} onToggle={toggleChip("notSoundLike")} />
           </QuizCard>
-          <QuizCard label="Q14 · Brand Voice" question="What are your 3–5 core voice rules?">
+          <QuizCard label="Q14 · Brand Voice" question="What are your 3–5 core voice rules?" confidence={confidence.voiceRules}>
             <TextArea value={form.voiceRules || ""} onChange={set("voiceRules")} rows={4} placeholder="e.g. Simplify what seems complex. Speak bitter truths calmly…" />
           </QuizCard>
         </div>
       )}
 
-      {/* Section: Pillars */}
-      {activeSection === 4 && (
+      {/* Section 5: Pillars */}
+      {activeSection === 5 && (
         <div className="animate-fade-in-up">
           {[
             { key: "pillar1", q: "First core message theme — and why it matters", label: "Q15 · Pillar 1" },
@@ -201,47 +293,47 @@ export default function Onboarding() {
             { key: "pillar3", q: "Third core message theme", label: "Q17 · Pillar 3" },
             { key: "pillar4", q: "Fourth core message theme (optional)", label: "Q18 · Pillar 4" },
           ].map(item => (
-            <QuizCard key={item.key} label={item.label} question={item.q}>
+            <QuizCard key={item.key} label={item.label} question={item.q} confidence={confidence[item.key]}>
               <TextArea value={form[item.key] || ""} onChange={set(item.key)} />
             </QuizCard>
           ))}
         </div>
       )}
 
-      {/* Section: Content */}
-      {activeSection === 5 && (
+      {/* Section 6: Content */}
+      {activeSection === 6 && (
         <div className="animate-fade-in-up">
-          <QuizCard label="Q19 · Content Identity" question="What are the main content buckets this brand will publish around?">
+          <QuizCard label="Q19 · Content Identity" question="What are the main content buckets this brand will publish around?" confidence={confidence.contentBuckets}>
             <TextArea value={form.contentBuckets || ""} onChange={set("contentBuckets")} rows={4} placeholder="1. Demystifying business infrastructure…" />
           </QuizCard>
-          <QuizCard label="Q20 · Content Identity" question="What is the one rule that keeps your content on-brand?">
+          <QuizCard label="Q20 · Content Identity" question="What is the one rule that keeps your content on-brand?" confidence={confidence.contentRule}>
             <TextInput value={form.contentRule || ""} onChange={set("contentRule")} placeholder="Say it directly, and say it calm…" />
           </QuizCard>
         </div>
       )}
 
-      {/* Section: Words */}
-      {activeSection === 6 && (
+      {/* Section 7: Words */}
+      {activeSection === 7 && (
         <div className="animate-fade-in-up">
-          <QuizCard label="Q21 · Words & Angles" question="Words, phrases, or angles this brand should NEVER use.">
+          <QuizCard label="Q21 · Words & Angles" question="Words, phrases, or angles this brand should NEVER use." confidence={confidence.avoidWords}>
             <TextArea value={form.avoidWords || ""} onChange={set("avoidWords")} placeholder="hustle, grind, guarantee, 10x…" />
           </QuizCard>
-          <QuizCard label="Q22 · Words & Angles" question="Words or phrases to reach for instead.">
+          <QuizCard label="Q22 · Words & Angles" question="Words or phrases to reach for instead." confidence={confidence.reachWords}>
             <TextArea value={form.reachWords || ""} onChange={set("reachWords")} placeholder="clarity, alignment, infrastructure, partnership…" />
           </QuizCard>
         </div>
       )}
 
-      {/* Section: Bio & CTAs */}
-      {activeSection === 7 && (
+      {/* Section 8: Bio & CTAs */}
+      {activeSection === 8 && (
         <div className="animate-fade-in-up">
-          <QuizCard label="Q23 · Bio & CTAs" question="Write a short public-facing bio or tagline.">
+          <QuizCard label="Q23 · Bio & CTAs" question="Write a short public-facing bio or tagline." confidence={confidence.bio}>
             <TextArea value={form.bio || ""} onChange={set("bio")} rows={3} />
           </QuizCard>
-          <QuizCard label="Q24 · Bio & CTAs" question="Soft trust CTAs — low-pressure invitations to connect.">
+          <QuizCard label="Q24 · Bio & CTAs" question="Soft trust CTAs — low-pressure invitations to connect." confidence={confidence.softCTAs}>
             <TextArea value={form.softCTAs || ""} onChange={set("softCTAs")} placeholder="If you're thinking about making the move…" />
           </QuizCard>
-          <QuizCard label="Q25 · Bio & CTAs" question="Mid-conversion CTAs — when someone is closer to deciding.">
+          <QuizCard label="Q25 · Bio & CTAs" question="Mid-conversion CTAs — when someone is closer to deciding." confidence={confidence.conversionCTAs}>
             <TextArea value={form.conversionCTAs || ""} onChange={set("conversionCTAs")} placeholder="Book a free strategy call. Explore our work…" />
           </QuizCard>
         </div>
