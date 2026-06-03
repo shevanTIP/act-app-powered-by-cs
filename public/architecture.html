@@ -1,0 +1,502 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACT — Technical Architecture</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink:       #380A65;
+      --twilight:  #1B2D52;
+      --electric:  #6C00FF;
+      --bright:    #0033FF;
+      --off-white: #F8F7FC;
+      --surface:   #FFFFFF;
+      --muted:     #7B6B8A;
+      --border:    rgba(56,10,101,0.12);
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--off-white);
+      color: var(--twilight);
+      padding: 48px 32px 80px;
+      min-height: 100vh;
+    }
+
+    /* ── Header ── */
+    .page-header {
+      text-align: center;
+      margin-bottom: 56px;
+    }
+    .page-header h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 28px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .page-header p {
+      font-size: 14px;
+      color: var(--muted);
+    }
+    .eyebrow {
+      font-size: 11px;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 2px;
+      color: var(--electric);
+      margin-bottom: 10px;
+    }
+
+    /* ── Flow layout ── */
+    .flow {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 0;
+      max-width: 1100px;
+      margin: 0 auto;
+    }
+
+    /* ── Connector arrow ── */
+    .arrow {
+      width: 2px;
+      height: 32px;
+      background: linear-gradient(to bottom, var(--electric), rgba(108,0,255,0.3));
+      position: relative;
+    }
+    .arrow::after {
+      content: '';
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      border-left: 5px solid transparent;
+      border-right: 5px solid transparent;
+      border-top: 8px solid rgba(108,0,255,0.5);
+    }
+    .arrow-wide {
+      width: 100%;
+      display: flex;
+      justify-content: center;
+    }
+
+    /* ── Row of cards ── */
+    .row {
+      display: flex;
+      gap: 14px;
+      width: 100%;
+      justify-content: center;
+      align-items: stretch;
+    }
+
+    /* ── Section label ── */
+    .section-label {
+      width: 100%;
+      text-align: center;
+      font-size: 10px;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 2.5px;
+      color: var(--muted);
+      margin-bottom: 10px;
+      margin-top: 4px;
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 18px 20px;
+      flex: 1;
+      min-width: 0;
+    }
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 14px;
+      font-weight: 600;
+      color: var(--ink);
+      margin-bottom: 8px;
+    }
+    .card-sub {
+      font-size: 12px;
+      color: var(--muted);
+      line-height: 1.6;
+    }
+    .card-sub li {
+      list-style: none;
+      padding: 2px 0;
+    }
+    .card-sub li::before {
+      content: '·  ';
+      color: var(--electric);
+      font-weight: 700;
+    }
+    .card-tag {
+      display: inline-block;
+      font-size: 10px;
+      font-weight: 600;
+      padding: 2px 8px;
+      border-radius: 8px;
+      margin-bottom: 10px;
+    }
+
+    /* ── Card colour variants ── */
+    .card-dark {
+      background: var(--ink);
+      border-color: var(--ink);
+    }
+    .card-dark .card-title { color: white; }
+    .card-dark .card-sub   { color: rgba(255,255,255,0.6); }
+    .card-dark .card-sub li::before { color: #A37FD4; }
+
+    .card-electric {
+      background: linear-gradient(135deg, var(--ink), var(--electric));
+      border-color: var(--electric);
+    }
+    .card-electric .card-title { color: white; font-size: 18px; }
+    .card-electric .card-sub   { color: rgba(255,255,255,0.7); }
+
+    .card-highlight {
+      border-color: var(--electric);
+      background: rgba(108,0,255,0.04);
+    }
+    .card-highlight .card-title { color: var(--electric); }
+
+    .card-warning {
+      border-color: #E0A020;
+      background: rgba(224,160,32,0.05);
+    }
+    .card-warning .card-title { color: #9A6400; }
+
+    .card-green {
+      border-color: #00A550;
+      background: rgba(0,165,80,0.05);
+    }
+    .card-green .card-title { color: #007040; }
+
+    /* ── Priority badges ── */
+    .p1 { background: rgba(200,0,0,0.1);    color: #CC2200; }
+    .p2 { background: rgba(224,160,32,0.15); color: #9A6400; }
+    .p3 { background: rgba(0,165,80,0.1);   color: #007040; }
+    .p4 { background: rgba(108,0,255,0.1);  color: var(--electric); }
+
+    /* ── Wide single card ── */
+    .card-wide {
+      width: 100%;
+      max-width: 680px;
+    }
+
+    /* ── Branching connector ── */
+    .branch-line {
+      width: 100%;
+      position: relative;
+      height: 32px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .branch-line::before {
+      content: '';
+      position: absolute;
+      top: 0;
+      left: 15%;
+      right: 15%;
+      height: 1px;
+      background: linear-gradient(to right, transparent, rgba(108,0,255,0.25), rgba(108,0,255,0.4), rgba(108,0,255,0.25), transparent);
+    }
+
+    /* ── Footer ── */
+    .legend {
+      display: flex;
+      justify-content: center;
+      gap: 24px;
+      margin-top: 56px;
+      flex-wrap: wrap;
+    }
+    .legend-item {
+      display: flex;
+      align-items: center;
+      gap: 7px;
+      font-size: 12px;
+      color: var(--muted);
+    }
+    .legend-dot {
+      width: 10px; height: 10px; border-radius: 50%;
+    }
+  </style>
+</head>
+<body>
+
+  <div class="page-header">
+    <div class="eyebrow">Technical Architecture</div>
+    <h1>ACT — Build Roadmap</h1>
+    <p>What a technical architect needs to design and implement</p>
+  </div>
+
+  <div class="flow">
+
+    <!-- ① USER -->
+    <div class="section-label">Entry Point</div>
+    <div class="row" style="max-width:320px;">
+      <div class="card card-electric" style="text-align:center; padding: 22px 28px;">
+        <div class="card-title" style="font-size:16px; margin-bottom:4px;">User / Client</div>
+        <div class="card-sub" style="color:rgba(255,255,255,0.65);">Browser · Web app</div>
+      </div>
+    </div>
+
+    <div class="arrow-wide"><div class="arrow"></div></div>
+
+    <!-- ② FRONTEND -->
+    <div class="section-label">Frontend — Already Built</div>
+    <div class="row">
+      <div class="card card-dark">
+        <span class="card-tag p3">Done ✓</span>
+        <div class="card-title">React + Vite SPA</div>
+        <ul class="card-sub">
+          <li>Dashboard — generate, review, queue</li>
+          <li>Swipe review — approve / discard / edit</li>
+          <li>Voice guide quiz — 25 questions</li>
+          <li>Queue with per-post platform selector</li>
+          <li>AppContext + localStorage state</li>
+          <li>GHL push stub wired and ready</li>
+        </ul>
+      </div>
+      <div class="card card-dark">
+        <span class="card-tag p3">Done ✓</span>
+        <div class="card-title">Brand & Design System</div>
+        <ul class="card-sub">
+          <li>Inter + Space Grotesk (local fonts)</li>
+          <li>Ink / Electric / Twilight palette</li>
+          <li>Ikigai + Cloudsprout logos</li>
+          <li>Responsive card + chip components</li>
+          <li>Toast notifications</li>
+          <li>Animated swipe card stack</li>
+        </ul>
+      </div>
+      <div class="card card-dark">
+        <span class="card-tag p3">Done ✓</span>
+        <div class="card-title">AI Generation (browser)</div>
+        <ul class="card-sub">
+          <li>Anthropic claude-sonnet-4 direct call</li>
+          <li>Voice guide → system prompt builder</li>
+          <li>Weekly context + events → user prompt</li>
+          <li>Platform-aware generation</li>
+          <li>Per-post regenerate (new angle)</li>
+          <li>⚠ API key must move server-side</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="arrow-wide"><div class="arrow"></div></div>
+
+    <!-- ③ AUTH -->
+    <div class="section-label">Must-Have Before Any Real User</div>
+    <div class="row">
+      <div class="card card-highlight">
+        <span class="card-tag p1">Priority 1</span>
+        <div class="card-title">Authentication</div>
+        <ul class="card-sub">
+          <li>OAuth — Google / email magic link</li>
+          <li>Auth0, Supabase Auth, or Clerk</li>
+          <li>Session management + JWT</li>
+          <li>Multi-workspace support</li>
+          <li>Role-based access (manager / client)</li>
+        </ul>
+      </div>
+      <div class="card card-highlight">
+        <span class="card-tag p1">Priority 1</span>
+        <div class="card-title">Database Layer</div>
+        <ul class="card-sub">
+          <li>Supabase (PostgreSQL + RLS) recommended</li>
+          <li>Voice guide — versioned, per workspace</li>
+          <li>Posts — full state machine in DB</li>
+          <li>Generation history + cost log</li>
+          <li>Row-level security — no cross-tenant leaks</li>
+        </ul>
+      </div>
+      <div class="card card-highlight">
+        <span class="card-tag p1">Priority 1</span>
+        <div class="card-title">Server-Side AI API</div>
+        <ul class="card-sub">
+          <li>Move Anthropic calls off browser</li>
+          <li>API key secured server-side only</li>
+          <li>Per-user quota enforced in DB</li>
+          <li>Retry + timeout + error handling</li>
+          <li>Token cost tracking per user</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="arrow-wide"><div class="arrow"></div></div>
+
+    <!-- ④ INTEGRATIONS -->
+    <div class="section-label">Core Integrations</div>
+    <div class="row">
+      <div class="card">
+        <span class="card-tag p1">Priority 1</span>
+        <div class="card-title">GoHighLevel (GHL)</div>
+        <ul class="card-sub">
+          <li>OAuth flow — users connect their sub-account</li>
+          <li>Store locationId + access/refresh tokens</li>
+          <li>Token refresh lifecycle</li>
+          <li>Map post → GHL Social Planner payload</li>
+          <li>Platform char limits (X = 280, etc.)</li>
+          <li>Webhook listener — publish / fail status back</li>
+          <li>Handle GHL plan tier API availability</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="card-tag p2">Priority 2</span>
+        <div class="card-title">Stripe Billing</div>
+        <ul class="card-sub">
+          <li>Subscription tiers (Starter / Pro / Agency)</li>
+          <li>Webhook → update plan in DB</li>
+          <li>Quota tied to plan level</li>
+          <li>Overage handling — block or charge</li>
+          <li>Usage dashboard for operator</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="card-tag p2">Priority 2</span>
+        <div class="card-title">Scheduling Engine</div>
+        <ul class="card-sub">
+          <li>Resolve scheduledDay + time → UTC datetime</li>
+          <li>User timezone handling</li>
+          <li>Queue runner — fires GHL push at right time</li>
+          <li>Dead-letter queue — retry with backoff</li>
+          <li>BullMQ + Redis or Inngest / Trigger.dev</li>
+          <li>Status sync back to DB + frontend</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="arrow-wide"><div class="arrow"></div></div>
+
+    <!-- ⑤ RETENTION FEATURES -->
+    <div class="section-label">Retention & Intelligence Layer</div>
+    <div class="row">
+      <div class="card">
+        <span class="card-tag p2">Priority 2</span>
+        <div class="card-title">Voice Guide Versioning</div>
+        <ul class="card-sub">
+          <li>Every save creates a timestamped version</li>
+          <li>Rollback to any previous version</li>
+          <li>Diff view between versions</li>
+          <li>Critical — guide is the AI system prompt</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="card-tag p2">Priority 2</span>
+        <div class="card-title">Analytics & Reporting</div>
+        <ul class="card-sub">
+          <li>Connect Instagram Graph / LinkedIn / X APIs</li>
+          <li>Aggregate reach + engagement per post</li>
+          <li>Weekly performance summary per bucket</li>
+          <li>Feed performance → generation weighting</li>
+          <li>GHL reporting API for published results</li>
+        </ul>
+      </div>
+      <div class="card">
+        <span class="card-tag p3">Priority 3</span>
+        <div class="card-title">Image Generation</div>
+        <ul class="card-sub">
+          <li>Replace gradient placeholders with real visuals</li>
+          <li>DALL-E 3, Stability AI, or Ideogram</li>
+          <li>Store in S3 / Cloudflare R2</li>
+          <li>Size variants per platform (1:1, 16:9, 9:16)</li>
+          <li>On-brand style locking via prompt</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="arrow-wide"><div class="arrow"></div></div>
+
+    <!-- ⑥ INFRASTRUCTURE -->
+    <div class="section-label">Infrastructure & DevOps</div>
+    <div class="row">
+      <div class="card card-dark">
+        <span class="card-tag p2" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);">Infra</span>
+        <div class="card-title">Deployment</div>
+        <ul class="card-sub">
+          <li>Vercel or Railway — frontend + API routes</li>
+          <li>Separate worker service for scheduler</li>
+          <li>Dev → Staging → Production environments</li>
+          <li>Separate GHL sub-accounts per env</li>
+        </ul>
+      </div>
+      <div class="card card-dark">
+        <span class="card-tag p2" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);">Infra</span>
+        <div class="card-title">CI/CD & Secrets</div>
+        <ul class="card-sub">
+          <li>GitHub Actions — lint → test → build → deploy</li>
+          <li>Secrets vault — Doppler or AWS Secrets Manager</li>
+          <li>No API keys in env files or repos</li>
+          <li>Automated DB migrations on deploy</li>
+        </ul>
+      </div>
+      <div class="card card-dark">
+        <span class="card-tag p2" style="background:rgba(255,255,255,0.12);color:rgba(255,255,255,0.7);">Infra</span>
+        <div class="card-title">Observability</div>
+        <ul class="card-sub">
+          <li>Sentry — frontend + backend error tracking</li>
+          <li>Structured logs — every gen, schedule, GHL call</li>
+          <li>Axiom or Datadog for log aggregation</li>
+          <li>Uptime monitoring + alerting</li>
+        </ul>
+      </div>
+      <div class="card card-dark">
+        <span class="card-tag p1" style="background:rgba(255,100,100,0.2);color:#FF9090;">Security</span>
+        <div class="card-title">Security</div>
+        <ul class="card-sub">
+          <li>RLS on all DB queries</li>
+          <li>Input sanitisation → prompt injection guard</li>
+          <li>Rate limiting on all API routes</li>
+          <li>GHL token rotation strategy</li>
+          <li>GDPR — data retention policy</li>
+        </ul>
+      </div>
+    </div>
+
+    <div class="arrow-wide"><div class="arrow"></div></div>
+
+    <!-- ⑦ EXTERNAL SERVICES -->
+    <div class="section-label">External Services Dependency Map</div>
+    <div class="row">
+      <div class="card card-green" style="text-align:center;">
+        <div class="card-title">Anthropic</div>
+        <div class="card-sub">claude-sonnet-4<br/>AI generation</div>
+      </div>
+      <div class="card card-green" style="text-align:center;">
+        <div class="card-title">GoHighLevel</div>
+        <div class="card-sub">Social Planner<br/>Publishing + CRM</div>
+      </div>
+      <div class="card card-green" style="text-align:center;">
+        <div class="card-title">Stripe</div>
+        <div class="card-sub">Subscriptions<br/>Billing + webhooks</div>
+      </div>
+      <div class="card card-green" style="text-align:center;">
+        <div class="card-title">Supabase</div>
+        <div class="card-sub">PostgreSQL + Auth<br/>Storage + RLS</div>
+      </div>
+      <div class="card card-green" style="text-align:center;">
+        <div class="card-title">Platform APIs</div>
+        <div class="card-sub">Instagram · LinkedIn<br/>X · Facebook · TikTok</div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- Legend -->
+  <div class="legend">
+    <div class="legend-item"><div class="legend-dot" style="background:#CC2200;"></div> Priority 1 — Before any real user</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#9A6400;"></div> Priority 2 — Before charging</div>
+    <div class="legend-item"><div class="legend-dot" style="background:#007040;"></div> Priority 3 — Growth phase</div>
+    <div class="legend-item"><div class="legend-dot" style="background:var(--electric);"></div> Already built</div>
+  </div>
+
+</body>
+</html>
