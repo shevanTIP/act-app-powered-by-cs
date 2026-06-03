@@ -1,0 +1,882 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>ACT — Technical Setup Guide</title>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Space+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <style>
+    :root {
+      --ink:       #380A65;
+      --twilight:  #1B2D52;
+      --electric:  #6C00FF;
+      --bright:    #0033FF;
+      --off-white: #F8F7FC;
+      --surface:   #FFFFFF;
+      --muted:     #7B6B8A;
+      --border:    rgba(56,10,101,0.12);
+      --done:      #00A550;
+      --warn:      #C87800;
+      --danger:    #CC2200;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      font-family: 'Inter', sans-serif;
+      background: var(--off-white);
+      color: var(--twilight);
+      padding: 0 0 80px;
+    }
+    code, .mono {
+      font-family: 'JetBrains Mono', monospace;
+      font-size: 11px;
+      background: rgba(56,10,101,0.07);
+      padding: 2px 6px;
+      border-radius: 4px;
+      color: var(--electric);
+    }
+
+    /* ── Header ── */
+    .page-hero {
+      background: var(--ink);
+      padding: 48px 48px 40px;
+      position: relative;
+      overflow: hidden;
+      margin-bottom: 48px;
+    }
+    .page-hero::after {
+      content: '';
+      position: absolute;
+      top: -100px; right: -100px;
+      width: 400px; height: 400px;
+      border-radius: 50%;
+      background: radial-gradient(circle, rgba(108,0,255,0.25) 0%, transparent 70%);
+    }
+    .page-hero h1 {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 32px; font-weight: 700;
+      color: white; margin-bottom: 8px;
+      position: relative; z-index: 1;
+    }
+    .page-hero p {
+      font-size: 15px; color: rgba(255,255,255,0.55);
+      position: relative; z-index: 1; max-width: 600px;
+    }
+    .hero-badges {
+      display: flex; gap: 10px; margin-top: 20px;
+      position: relative; z-index: 1; flex-wrap: wrap;
+    }
+    .hero-badge {
+      display: flex; align-items: center; gap: 6px;
+      padding: 5px 12px; border-radius: 20px; font-size: 12px; font-weight: 500;
+    }
+
+    /* ── Layout ── */
+    .page-body { padding: 0 48px; }
+    .section { margin-bottom: 48px; }
+    .section-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 11px; font-weight: 700;
+      text-transform: uppercase; letter-spacing: 2.5px;
+      color: var(--muted); margin-bottom: 16px;
+      display: flex; align-items: center; gap: 12px;
+    }
+    .section-title::after {
+      content: ''; flex: 1; height: 1px; background: var(--border);
+    }
+
+    /* ── Grid ── */
+    .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+    .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+    .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 14px; }
+    @media (max-width: 900px) {
+      .grid-3, .grid-4 { grid-template-columns: 1fr 1fr; }
+      .grid-2 { grid-template-columns: 1fr; }
+    }
+
+    /* ── Cards ── */
+    .card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 20px 22px;
+    }
+    .card-dark {
+      background: var(--ink); color: white;
+      border-radius: 14px; padding: 20px 22px;
+    }
+    .card-title {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 15px; font-weight: 600; margin-bottom: 10px;
+    }
+    .card-dark .card-title { color: white; }
+    .card-sub { font-size: 13px; color: var(--muted); line-height: 1.7; }
+    .card-dark .card-sub { color: rgba(255,255,255,0.55); }
+
+    /* ── Status tags ── */
+    .tag {
+      display: inline-flex; align-items: center; gap: 5px;
+      font-size: 10px; font-weight: 700;
+      padding: 3px 9px; border-radius: 10px;
+      text-transform: uppercase; letter-spacing: 0.5px;
+      margin-bottom: 10px;
+    }
+    .tag-done    { background: rgba(0,165,80,0.1);   color: var(--done); }
+    .tag-p1      { background: rgba(204,34,0,0.1);   color: var(--danger); }
+    .tag-p2      { background: rgba(200,120,0,0.1);  color: var(--warn); }
+    .tag-p3      { background: rgba(108,0,255,0.1);  color: var(--electric); }
+    .tag-infra   { background: rgba(27,45,82,0.1);   color: var(--twilight); }
+
+    /* ── File callout ── */
+    .file-list { display: flex; flex-direction: column; gap: 5px; margin-top: 10px; }
+    .file-item {
+      display: flex; align-items: baseline; gap: 8px;
+      font-size: 12px;
+    }
+    .file-item .path { font-family: 'JetBrains Mono', monospace; font-size: 11px; color: var(--electric); }
+    .file-item .desc { color: var(--muted); font-size: 11px; }
+
+    /* ── Step blocks ── */
+    .step-flow {
+      display: flex; flex-direction: column; gap: 0;
+    }
+    .step {
+      display: grid;
+      grid-template-columns: 56px 1fr;
+      gap: 0;
+    }
+    .step-spine {
+      display: flex; flex-direction: column; align-items: center;
+    }
+    .step-num {
+      width: 36px; height: 36px; border-radius: 50%;
+      background: var(--ink); color: white;
+      font-family: 'Space Grotesk', sans-serif; font-weight: 700; font-size: 14px;
+      display: flex; align-items: center; justify-content: center;
+      flex-shrink: 0; z-index: 1;
+    }
+    .step-num.done { background: var(--done); }
+    .step-num.p1   { background: var(--danger); }
+    .step-num.p2   { background: var(--warn); }
+    .step-num.p3   { background: var(--electric); }
+    .step-line {
+      width: 2px; flex: 1; min-height: 20px;
+      background: linear-gradient(to bottom, rgba(56,10,101,0.2), transparent);
+      margin: 4px 0;
+    }
+    .step-content {
+      padding: 0 0 28px 16px;
+    }
+    .step-header {
+      font-family: 'Space Grotesk', sans-serif;
+      font-size: 16px; font-weight: 600; color: var(--ink);
+      margin-bottom: 4px; padding-top: 6px;
+    }
+    .step-tagline { font-size: 12px; color: var(--muted); margin-bottom: 14px; }
+
+    /* ── Env vars box ── */
+    .env-box {
+      background: #0D0D1A;
+      border-radius: 10px;
+      padding: 14px 18px;
+      margin-top: 12px;
+    }
+    .env-line { font-family: 'JetBrains Mono', monospace; font-size: 12px; line-height: 2; }
+    .env-key   { color: #7EC8E3; }
+    .env-val   { color: #A8D8A8; }
+    .env-comment { color: #666; }
+
+    /* ── Data model ── */
+    .table { width: 100%; border-collapse: collapse; font-size: 12px; margin-top: 10px; }
+    .table th { font-weight: 600; color: var(--muted); font-size: 10px; text-transform: uppercase; letter-spacing: 1px; padding: 6px 10px; text-align: left; border-bottom: 1px solid var(--border); }
+    .table td { padding: 7px 10px; border-bottom: 1px solid var(--border); vertical-align: top; line-height: 1.5; }
+    .table tr:last-child td { border-bottom: none; }
+    .table .field { font-family: 'JetBrains Mono', monospace; color: var(--electric); font-size: 11px; }
+    .table .type  { font-family: 'JetBrains Mono', monospace; color: var(--warn); font-size: 11px; }
+
+    /* ── Flow arrows ── */
+    .arrow-row {
+      display: flex; align-items: center; justify-content: center;
+      gap: 8px; margin: 12px 0; flex-wrap: wrap;
+    }
+    .arrow-box {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 10px; padding: 8px 16px;
+      font-size: 12px; font-weight: 500; color: var(--twilight);
+      text-align: center;
+    }
+    .arrow-connector {
+      color: var(--electric); font-size: 18px; font-weight: 700; flex-shrink: 0;
+    }
+    .arrow-box.highlight { border-color: var(--electric); background: rgba(108,0,255,0.05); color: var(--electric); }
+    .arrow-box.dark { background: var(--ink); color: white; border-color: var(--ink); }
+
+    /* ── Integration grid ── */
+    .int-card {
+      border: 1px solid var(--border); border-radius: 12px;
+      padding: 16px 18px; background: var(--surface);
+    }
+    .int-title { font-weight: 600; font-size: 14px; color: var(--ink); margin-bottom: 6px; }
+    .int-url   { font-family: 'JetBrains Mono', monospace; font-size: 10px; color: var(--electric); margin-bottom: 8px; display: block; }
+    .int-steps { font-size: 12px; color: var(--muted); line-height: 1.8; }
+    .int-steps li { list-style: none; padding-left: 14px; position: relative; }
+    .int-steps li::before { content: '→'; position: absolute; left: 0; color: var(--electric); font-size: 10px; top: 2px; }
+
+    /* ── Webhook table ── */
+    .webhook-row {
+      display: flex; gap: 12px; align-items: flex-start;
+      padding: 10px 0; border-bottom: 1px solid var(--border);
+      font-size: 12px;
+    }
+    .webhook-row:last-child { border-bottom: none; }
+    .webhook-event { font-family: 'JetBrains Mono', monospace; color: var(--electric); font-size: 11px; min-width: 200px; }
+    .webhook-action { color: var(--muted); flex: 1; line-height: 1.6; }
+
+    /* ── Already built callout ── */
+    .built-banner {
+      background: linear-gradient(135deg, var(--ink), #2D0854);
+      border-radius: 14px; padding: 24px 28px;
+      margin-bottom: 32px; position: relative; overflow: hidden;
+    }
+    .built-banner::after {
+      content: ''; position: absolute; top: -40px; right: -40px;
+      width: 160px; height: 160px; border-radius: 50%;
+      background: radial-gradient(circle, rgba(108,0,255,0.3) 0%, transparent 70%);
+    }
+    .built-banner h2 {
+      font-family: 'Space Grotesk', sans-serif;
+      color: white; font-size: 18px; margin-bottom: 6px;
+      position: relative; z-index: 1;
+    }
+    .built-banner p {
+      color: rgba(255,255,255,0.5); font-size: 13px;
+      position: relative; z-index: 1; margin-bottom: 16px;
+    }
+
+    /* ── Tip box ── */
+    .tip {
+      background: rgba(108,0,255,0.05); border: 1px solid rgba(108,0,255,0.15);
+      border-radius: 10px; padding: 12px 16px; font-size: 12px;
+      color: var(--twilight); line-height: 1.6; margin-top: 10px;
+    }
+    .tip strong { color: var(--electric); }
+  </style>
+</head>
+<body>
+
+<!-- HEADER -->
+<div class="page-hero">
+  <h1>ACT — Technical Setup Guide</h1>
+  <p>Everything a backend developer needs to take the frontend skeleton to a production SaaS. Follow the steps in order — each one unlocks the next.</p>
+  <div class="hero-badges">
+    <div class="hero-badge" style="background:rgba(0,165,80,0.2);color:#80FFB8;">✓ Frontend skeleton built</div>
+    <div class="hero-badge" style="background:rgba(204,34,0,0.2);color:#FFA0A0;">Phase 1 — Auth + API + GHL core</div>
+    <div class="hero-badge" style="background:rgba(200,120,0,0.2);color:#FFD080;">Phase 2 — Billing + Scheduler + Analytics</div>
+    <div class="hero-badge" style="background:rgba(108,0,255,0.2);color:#C8A0FF;">Phase 3 — Multi-model visuals + Intelligence loop</div>
+  </div>
+</div>
+
+<div class="page-body">
+
+  <!-- ══════════════════════════════════════════════════════
+       SECTION 0 — WHAT'S ALREADY BUILT
+  ══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">What's already built — frontend skeleton</div>
+
+    <div class="built-banner">
+      <h2>Frontend skeleton is complete and running</h2>
+      <p>React + Vite app. Run <code style="background:rgba(255,255,255,0.1);color:#C8A0FF;">npm run dev</code> from the repo root. All pages render, state persists to localStorage, Anthropic API is wired for text generation. Backend integration points are clearly stubbed.</p>
+      <div style="display:flex;gap:8px;flex-wrap:wrap;position:relative;z-index:1;">
+        <span style="font-size:11px;padding:3px 10px;border-radius:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">React 18 + Vite</span>
+        <span style="font-size:11px;padding:3px 10px;border-radius:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">React Router v6</span>
+        <span style="font-size:11px;padding:3px 10px;border-radius:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">Tailwind CSS</span>
+        <span style="font-size:11px;padding:3px 10px;border-radius:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">AppContext + localStorage</span>
+        <span style="font-size:11px;padding:3px 10px;border-radius:8px;background:rgba(255,255,255,0.1);color:rgba(255,255,255,0.7);">Inter + Space Grotesk (local fonts)</span>
+      </div>
+    </div>
+
+    <div class="grid-3">
+      <div class="card">
+        <div class="tag tag-done">✓ Built</div>
+        <div class="card-title">Pages & Routes</div>
+        <div class="file-list">
+          <div class="file-item"><span class="path">/dashboard</span><span class="desc">Weekly update, generate, stats</span></div>
+          <div class="file-item"><span class="path">/onboarding</span><span class="desc">25-question quiz + website scanner</span></div>
+          <div class="file-item"><span class="path">/swipe</span><span class="desc">Tinder-style review stack</span></div>
+          <div class="file-item"><span class="path">/queue</span><span class="desc">Per-post platform selector + discards</span></div>
+          <div class="file-item"><span class="path">/voice-guide</span><span class="desc">Read-only brand DNA view</span></div>
+          <div class="file-item"><span class="path">/assets</span><span class="desc">Brand asset library upload/manage</span></div>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="tag tag-done">✓ Built</div>
+        <div class="card-title">State & Data Layer</div>
+        <div class="file-list">
+          <div class="file-item"><span class="path">src/context/AppContext.jsx</span><span class="desc">Global state + all reducers</span></div>
+          <div class="file-item"><span class="path">src/lib/mockData.js</span><span class="desc">Seed data, constants, icons</span></div>
+          <div class="file-item"><span class="path">localStorage</span><span class="desc">Full persistence (replace with Supabase)</span></div>
+        </div>
+        <div class="tip" style="margin-top:12px;">State shape in <code>AppContext.jsx</code> maps 1:1 to the Supabase schema below. Replace <code>localStorage</code> reads/writes with Supabase queries.</div>
+      </div>
+
+      <div class="card">
+        <div class="tag tag-done">✓ Built</div>
+        <div class="card-title">AI Integration Stubs</div>
+        <div class="file-list">
+          <div class="file-item"><span class="path">src/lib/anthropic.js</span><span class="desc">All Claude API calls live here</span></div>
+          <div class="file-item"><span class="path">generatePosts()</span><span class="desc">Caption + visualBrief + format generation</span></div>
+          <div class="file-item"><span class="path">regeneratePost()</span><span class="desc">Single post fresh angle</span></div>
+          <div class="file-item"><span class="path">scrapeAndFillVoiceGuide()</span><span class="desc">Jina Reader → Claude voice guide fill</span></div>
+          <div class="file-item"><span class="path">GHL_INTEGRATION.pushToGHL()</span><span class="desc">Stub — wire up in Phase 1</span></div>
+        </div>
+        <div class="tip" style="margin-top:12px;"><strong>Move these to server-side.</strong> Currently runs in browser (demo only). In production, <code>anthropic.js</code> should call your own API route, not Anthropic directly.</div>
+      </div>
+    </div>
+
+    <div style="margin-top:16px;" class="grid-4">
+      <div class="card">
+        <div class="tag tag-done">✓ Built</div>
+        <div class="card-title" style="font-size:13px;">Generation pipeline</div>
+        <div class="card-sub">Voice guide + assets + events + platforms → Claude captions + visual briefs → post objects</div>
+      </div>
+      <div class="card">
+        <div class="tag tag-done">✓ Built</div>
+        <div class="card-title" style="font-size:13px;">Asset library</div>
+        <div class="card-sub">Upload logos, faces, mascots, style refs. Stored as dataURLs in localStorage. Move to R2 in production.</div>
+      </div>
+      <div class="card">
+        <div class="tag tag-done">✓ Built</div>
+        <div class="card-title" style="font-size:13px;">Website scanner</div>
+        <div class="card-sub">Jina Reader scrapes site → Claude fills voice guide form. Confidence badges per field.</div>
+      </div>
+      <div class="card">
+        <div class="tag tag-done">✓ Built</div>
+        <div class="card-title" style="font-size:13px;">GHL push stub</div>
+        <div class="card-sub"><code>GHL_INTEGRATION.pushToGHL()</code> in <code>anthropic.js</code> — throws placeholder error. Wire up in Step 4.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       FULL SYSTEM FLOW
+  ══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Full system data flow</div>
+    <div class="card" style="padding:24px 28px;">
+      <div class="arrow-row">
+        <div class="arrow-box dark">User (browser)</div>
+        <div class="arrow-connector">→</div>
+        <div class="arrow-box">ACT Frontend<br/><span style="font-size:10px;color:var(--muted);">React + Vite — already built</span></div>
+        <div class="arrow-connector">→</div>
+        <div class="arrow-box highlight">Supabase Auth<br/><span style="font-size:10px;">Step 1</span></div>
+      </div>
+      <div style="text-align:center;color:var(--muted);font-size:20px;margin:4px 0;">↓</div>
+      <div class="arrow-row">
+        <div class="arrow-box">Jina Reader<br/><span style="font-size:10px;color:var(--muted);">website scrape</span></div>
+        <div class="arrow-connector">→</div>
+        <div class="arrow-box highlight">Generation API<br/><span style="font-size:10px;">Step 2 — serverless fn</span></div>
+        <div class="arrow-connector">←→</div>
+        <div class="arrow-box">Cloudflare R2<br/><span style="font-size:10px;color:var(--muted);">asset storage</span></div>
+      </div>
+      <div style="text-align:center;color:var(--muted);font-size:20px;margin:4px 0;">↓</div>
+      <div class="arrow-row">
+        <div class="arrow-box dark">Claude<br/><span style="font-size:10px;opacity:0.6;">captions + briefs</span></div>
+        <div class="arrow-connector" style="color:var(--muted);">+</div>
+        <div class="arrow-box dark">Nano Banana<br/><span style="font-size:10px;opacity:0.6;">image gen</span></div>
+        <div class="arrow-connector" style="color:var(--muted);">+</div>
+        <div class="arrow-box dark">Veo 3<br/><span style="font-size:10px;opacity:0.6;">video gen</span></div>
+      </div>
+      <div style="text-align:center;color:var(--muted);font-size:20px;margin:4px 0;">↓</div>
+      <div class="arrow-row">
+        <div class="arrow-box">Post approved<br/><span style="font-size:10px;color:var(--muted);">in swipe review</span></div>
+        <div class="arrow-connector">→</div>
+        <div class="arrow-box highlight">GHL Social Planner<br/><span style="font-size:10px;">Step 3 — OAuth</span></div>
+        <div class="arrow-connector">→</div>
+        <div class="arrow-box">Instagram · LinkedIn<br/>X · Facebook · TikTok</div>
+      </div>
+      <div style="text-align:center;color:var(--muted);font-size:20px;margin:4px 0;">↓</div>
+      <div class="arrow-row">
+        <div class="arrow-box">ACT webhook bridge<br/><span style="font-size:10px;color:var(--muted);">events fired on state change</span></div>
+        <div class="arrow-connector">→</div>
+        <div class="arrow-box highlight">GHL Workflows<br/><span style="font-size:10px;">Step 5 — automation</span></div>
+        <div class="arrow-connector">→</div>
+        <div class="arrow-box">Email · SMS · CRM<br/>Pipeline · Calendar</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       STEP-BY-STEP SETUP
+  ══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Setup steps — in order</div>
+    <div class="step-flow">
+
+      <!-- STEP 1 -->
+      <div class="step">
+        <div class="step-spine">
+          <div class="step-num p1">1</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">Supabase — Auth + Database</div>
+          <div class="step-tagline">Creates the user system and replaces localStorage. Everything else depends on this.</div>
+          <div class="grid-2">
+            <div class="int-card">
+              <div class="int-title">Create Supabase project</div>
+              <span class="int-url">supabase.com → New project</span>
+              <ul class="int-steps">
+                <li>Create project, note the project URL and anon key</li>
+                <li>Enable Email + Google OAuth providers</li>
+                <li>Create the tables below (schema section)</li>
+                <li>Enable Row Level Security on every table</li>
+                <li>Add RLS policy: <code>user_id = auth.uid()</code> on all rows</li>
+              </ul>
+            </div>
+            <div class="int-card">
+              <div class="int-title">Wire into frontend</div>
+              <span class="int-url">npm install @supabase/supabase-js</span>
+              <ul class="int-steps">
+                <li>Create <code>src/lib/supabase.js</code> with client init</li>
+                <li>Replace <code>AppContext.jsx</code> localStorage reads/writes with Supabase queries</li>
+                <li>Add login/logout flow (currently no auth in demo)</li>
+                <li>On login: load user's voiceGuide, posts, assets from DB</li>
+                <li>On state change: write to DB instead of localStorage</li>
+              </ul>
+            </div>
+          </div>
+          <div class="env-box">
+            <div class="env-line"><span class="env-key">VITE_SUPABASE_URL</span>=<span class="env-val">https://your-project.supabase.co</span></div>
+            <div class="env-line"><span class="env-key">VITE_SUPABASE_ANON_KEY</span>=<span class="env-val">eyJhbG...</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 2 -->
+      <div class="step">
+        <div class="step-spine">
+          <div class="step-num p1">2</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">Generation API — Move AI off the browser</div>
+          <div class="step-tagline">Claude API key currently lives in the browser (demo only). Move it server-side before any real users.</div>
+          <div class="grid-2">
+            <div class="int-card">
+              <div class="int-title">Create serverless function</div>
+              <span class="int-url">Vercel function / Supabase Edge Function</span>
+              <ul class="int-steps">
+                <li>Create <code>api/generate.js</code> (or edge function)</li>
+                <li>Move all logic from <code>src/lib/anthropic.js</code> into it</li>
+                <li>Add per-user quota check against Supabase before calling Claude</li>
+                <li>Log token usage to <code>generation_log</code> table after each call</li>
+                <li>Return post objects to frontend — same shape as current</li>
+              </ul>
+            </div>
+            <div class="int-card">
+              <div class="int-title">Update frontend call</div>
+              <span class="int-url">src/lib/anthropic.js → update fetch target</span>
+              <ul class="int-steps">
+                <li>Change fetch URL from <code>api.anthropic.com</code> to <code>/api/generate</code></li>
+                <li>Remove <code>anthropic-dangerous-direct-browser-access</code> header</li>
+                <li>Pass Supabase auth token in Authorization header</li>
+                <li>Server verifies token, checks quota, calls Claude</li>
+                <li><code>scrapeAndFillVoiceGuide()</code> stays browser-side (Jina Reader is public)</li>
+              </ul>
+            </div>
+          </div>
+          <div class="env-box" style="margin-top:12px;">
+            <div class="env-line"><span class="env-comment"># Server-side only — never in frontend</span></div>
+            <div class="env-line"><span class="env-key">ANTHROPIC_API_KEY</span>=<span class="env-val">sk-ant-...</span></div>
+            <div class="env-line"><span class="env-key">GOOGLE_AI_API_KEY</span>=<span class="env-val">AIza...</span> <span class="env-comment"># Nano Banana + Veo 3</span></div>
+          </div>
+          <div class="tip">
+            <strong>Nano Banana + Veo 3:</strong> Add Google AI Studio / Vertex AI calls to the same serverless function. Claude generates <code>visualBrief</code> and <code>referenceAssets</code> → pass those to Nano Banana (images) and Veo 3 (video/reel) in parallel. Store generated media in Cloudflare R2, attach CDN URL to post object.
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 3 -->
+      <div class="step">
+        <div class="step-spine">
+          <div class="step-num p1">3</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">Cloudflare R2 — Asset & Media Storage</div>
+          <div class="step-tagline">Replace base64 dataURLs in localStorage with real CDN-hosted files.</div>
+          <div class="grid-2">
+            <div class="int-card">
+              <div class="int-title">Brand assets (user-uploaded)</div>
+              <span class="int-url">R2 bucket: act-brand-assets</span>
+              <ul class="int-steps">
+                <li>Create R2 bucket with public access</li>
+                <li>Update <code>src/pages/Assets.jsx</code> — on upload, POST file to <code>/api/upload-asset</code></li>
+                <li>Server uploads to R2, returns CDN URL</li>
+                <li>Store CDN URL in Supabase <code>assets</code> table (not base64)</li>
+                <li>Asset manifest sent to Claude = labels + CDN URLs</li>
+              </ul>
+            </div>
+            <div class="int-card">
+              <div class="int-title">AI-generated media</div>
+              <span class="int-url">R2 bucket: act-generated-media</span>
+              <ul class="int-steps">
+                <li>After Nano Banana generates image → upload to R2</li>
+                <li>After Veo 3 generates video → upload to R2</li>
+                <li>Store CDN URL in Supabase <code>posts.media_url</code></li>
+                <li>Swipe card renders from CDN URL not gradient placeholder</li>
+                <li>CDN URL sent to GHL Social Planner with the post</li>
+              </ul>
+            </div>
+          </div>
+          <div class="env-box" style="margin-top:12px;">
+            <div class="env-line"><span class="env-key">R2_ACCOUNT_ID</span>=<span class="env-val">...</span></div>
+            <div class="env-line"><span class="env-key">R2_ACCESS_KEY_ID</span>=<span class="env-val">...</span></div>
+            <div class="env-line"><span class="env-key">R2_SECRET_ACCESS_KEY</span>=<span class="env-val">...</span></div>
+            <div class="env-line"><span class="env-key">R2_BUCKET_ASSETS</span>=<span class="env-val">act-brand-assets</span></div>
+            <div class="env-line"><span class="env-key">R2_BUCKET_MEDIA</span>=<span class="env-val">act-generated-media</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 4 -->
+      <div class="step">
+        <div class="step-spine">
+          <div class="step-num p1">4</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">GoHighLevel — OAuth + Social Planner</div>
+          <div class="step-tagline">Wire <code>GHL_INTEGRATION.pushToGHL()</code> in <code>src/lib/anthropic.js</code>. This is where posts go after approval.</div>
+          <div class="grid-2">
+            <div class="int-card">
+              <div class="int-title">GHL OAuth Setup</div>
+              <span class="int-url">marketplace.gohighlevel.com → Create App</span>
+              <ul class="int-steps">
+                <li>Create a Marketplace app, get Client ID + Secret</li>
+                <li>Set OAuth redirect URI to <code>/api/ghl/callback</code></li>
+                <li>Scopes needed: <code>social-media-posting.write</code>, <code>contacts.write</code>, <code>opportunities.write</code></li>
+                <li>Build connect flow: user clicks "Connect GHL" → OAuth → store <code>access_token</code> + <code>refresh_token</code> + <code>locationId</code> in Supabase</li>
+                <li>Build token refresh cron (GHL tokens expire)</li>
+              </ul>
+            </div>
+            <div class="int-card">
+              <div class="int-title">Social Planner — Post Push</div>
+              <span class="int-url">POST services.leadconnectorhq.com/social-media-posting</span>
+              <ul class="int-steps">
+                <li>On post approval → call <code>/api/ghl/schedule-post</code></li>
+                <li>Map ACT post → GHL payload: caption, platforms array, scheduledAt (UTC), mediaUrls</li>
+                <li>scheduledDay + scheduledTime + user timezone → real UTC datetime</li>
+                <li>Handle per-platform char limits (X = 280, etc.)</li>
+                <li>GHL returns post ID → store in Supabase <code>posts.ghl_post_id</code></li>
+              </ul>
+            </div>
+          </div>
+          <div class="env-box" style="margin-top:12px;">
+            <div class="env-line"><span class="env-key">GHL_CLIENT_ID</span>=<span class="env-val">...</span></div>
+            <div class="env-line"><span class="env-key">GHL_CLIENT_SECRET</span>=<span class="env-val">...</span></div>
+            <div class="env-line"><span class="env-comment"># Per-user tokens stored in Supabase, not env</span></div>
+          </div>
+          <div class="tip">
+            <strong>Integration point in codebase:</strong> Open <code>src/lib/anthropic.js</code> → find <code>GHL_INTEGRATION.pushToGHL()</code> at the bottom. Replace the <code>throw new Error</code> with a <code>fetch('/api/ghl/schedule-post', ...)</code> call. The post object shape and ghlConfig are already passed in correctly.
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 5 -->
+      <div class="step">
+        <div class="step-spine">
+          <div class="step-num p2">5</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">GHL Workflows — Automation Layer</div>
+          <div class="step-tagline">Build these workflows in GHL. ACT fires webhooks to trigger them — no custom notification system needed.</div>
+          <div class="card" style="padding:16px 20px;">
+            <div class="webhook-row">
+              <div class="webhook-event">user.created</div>
+              <div class="webhook-action">GHL: Create Contact → assign to "New User" pipeline stage → send welcome email → trigger intro call booking via Calendar</div>
+            </div>
+            <div class="webhook-row">
+              <div class="webhook-event">voiceguide.completed</div>
+              <div class="webhook-action">GHL: Update Contact field <code>voiceGuideComplete = true</code> → move pipeline to "Guide Built" → send "You're set up" email</div>
+            </div>
+            <div class="webhook-row">
+              <div class="webhook-event">posts.generated</div>
+              <div class="webhook-action">GHL: Send SMS/email "Your posts are ready to review" → link to /swipe</div>
+            </div>
+            <div class="webhook-row">
+              <div class="webhook-event">post.approved</div>
+              <div class="webhook-action">GHL: Move pipeline to "Actively Posting" → send confirmation with scheduled date/platform</div>
+            </div>
+            <div class="webhook-row">
+              <div class="webhook-event">post.published</div>
+              <div class="webhook-action">GHL: Send "Your post is live" notification → log activity on Contact → trigger engagement check-in after 48h</div>
+            </div>
+            <div class="webhook-row">
+              <div class="webhook-event">quota.warning</div>
+              <div class="webhook-action">GHL: Send "You have X generations remaining this week" warning → prompt to upgrade if on Starter plan</div>
+            </div>
+            <div class="webhook-row">
+              <div class="webhook-event">user.inactive (7 days)</div>
+              <div class="webhook-action">GHL: Move pipeline to "At Risk" → fire re-engagement sequence → flag account manager</div>
+            </div>
+          </div>
+          <div class="tip">
+            Build a single <code>/api/ghl/webhook-out</code> endpoint in your backend. ACT calls it on each state change. The endpoint maps the event type to a GHL workflow trigger via the GHL Workflow API. All notification logic lives in GHL — nothing to build custom.
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 6 -->
+      <div class="step">
+        <div class="step-spine">
+          <div class="step-num p2">6</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">GHL CRM — Contacts + Pipeline</div>
+          <div class="step-tagline">Every ACT user = a GHL Contact. Pipeline stages move automatically from the webhook bridge.</div>
+          <div class="grid-2">
+            <div class="int-card">
+              <div class="int-title">Contact custom fields</div>
+              <span class="int-url">GHL → Settings → Custom Fields → Contact</span>
+              <ul class="int-steps">
+                <li>brandName (text)</li>
+                <li>voiceGuideComplete (checkbox)</li>
+                <li>generationsUsedThisWeek (number)</li>
+                <li>planTier (dropdown: Starter/Pro/Agency)</li>
+                <li>activePlatforms (multi-select)</li>
+                <li>actUserId (text) — links GHL Contact to Supabase user</li>
+              </ul>
+            </div>
+            <div class="int-card">
+              <div class="int-title">Pipeline stages</div>
+              <span class="int-url">GHL → Pipelines → Create "ACT Clients"</span>
+              <ul class="int-steps">
+                <li>Signed Up</li>
+                <li>Voice Guide Built</li>
+                <li>First Posts Generated</li>
+                <li>First Post Approved</li>
+                <li>Actively Posting Weekly</li>
+                <li>At Risk (missed a week)</li>
+                <li>Churned</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 7 -->
+      <div class="step">
+        <div class="step-spine">
+          <div class="step-num p2">7</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">Stripe — Subscription Billing</div>
+          <div class="step-tagline">Quota enforcement moves server-side. Plan tier controls generation limit.</div>
+          <div class="grid-2">
+            <div class="int-card">
+              <div class="int-title">Products + prices</div>
+              <span class="int-url">dashboard.stripe.com → Products</span>
+              <ul class="int-steps">
+                <li>Starter — 20 generations/week</li>
+                <li>Pro — 60 generations/week</li>
+                <li>Agency — unlimited generations</li>
+                <li>Set up monthly + annual prices for each</li>
+              </ul>
+            </div>
+            <div class="int-card">
+              <div class="int-title">Webhook → plan sync</div>
+              <span class="int-url">/api/stripe/webhook</span>
+              <ul class="int-steps">
+                <li><code>checkout.session.completed</code> → update user plan in Supabase</li>
+                <li><code>customer.subscription.updated</code> → update plan tier</li>
+                <li><code>customer.subscription.deleted</code> → downgrade to Starter</li>
+                <li>Generation quota checked server-side against plan tier before every API call</li>
+              </ul>
+            </div>
+          </div>
+          <div class="env-box" style="margin-top:12px;">
+            <div class="env-line"><span class="env-key">STRIPE_SECRET_KEY</span>=<span class="env-val">sk_live_...</span></div>
+            <div class="env-line"><span class="env-key">STRIPE_WEBHOOK_SECRET</span>=<span class="env-val">whsec_...</span></div>
+          </div>
+        </div>
+      </div>
+
+      <!-- STEP 8 -->
+      <div class="step">
+        <div class="step-spine">
+          <div class="step-num p3">8</div>
+          <div class="step-line"></div>
+        </div>
+        <div class="step-content">
+          <div class="step-header">Infrastructure — CI/CD + Monitoring</div>
+          <div class="step-tagline">Set this up before going live with real users.</div>
+          <div class="grid-3">
+            <div class="int-card">
+              <div class="int-title">Deployment</div>
+              <ul class="int-steps">
+                <li>Connect repo to Vercel</li>
+                <li>Set all env vars in Vercel dashboard</li>
+                <li>Create Preview + Production environments</li>
+                <li>Serverless functions deploy automatically</li>
+              </ul>
+            </div>
+            <div class="int-card">
+              <div class="int-title">Error tracking</div>
+              <ul class="int-steps">
+                <li>Install Sentry: <code>npm install @sentry/react</code></li>
+                <li>Add <code>Sentry.init()</code> in <code>src/main.jsx</code></li>
+                <li>Add Sentry to serverless functions too</li>
+                <li>Set up Slack alert for new issues</li>
+              </ul>
+            </div>
+            <div class="int-card">
+              <div class="int-title">Rate limiting</div>
+              <ul class="int-steps">
+                <li>Add Upstash Redis for rate limiting</li>
+                <li>Limit <code>/api/generate</code>: 10 req/min per user</li>
+                <li>Limit <code>/api/ghl/schedule-post</code>: 20 req/min</li>
+                <li>Return 429 with clear error message</li>
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- end step-flow -->
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       DATABASE SCHEMA
+  ══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">Supabase database schema</div>
+    <div class="grid-2">
+      <div class="card">
+        <div class="card-title">users</div>
+        <table class="table">
+          <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+          <tr><td class="field">id</td><td class="type">uuid</td><td>Supabase auth.uid()</td></tr>
+          <tr><td class="field">email</td><td class="type">text</td><td></td></tr>
+          <tr><td class="field">plan_tier</td><td class="type">text</td><td>starter | pro | agency</td></tr>
+          <tr><td class="field">generations_used</td><td class="type">int</td><td>resets Monday 00:00 UTC</td></tr>
+          <tr><td class="field">ghl_location_id</td><td class="type">text</td><td>from OAuth</td></tr>
+          <tr><td class="field">ghl_access_token</td><td class="type">text</td><td>encrypted</td></tr>
+          <tr><td class="field">ghl_refresh_token</td><td class="type">text</td><td>encrypted</td></tr>
+          <tr><td class="field">stripe_customer_id</td><td class="type">text</td><td></td></tr>
+          <tr><td class="field">timezone</td><td class="type">text</td><td>for scheduledAt resolution</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">voice_guides</div>
+        <table class="table">
+          <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+          <tr><td class="field">id</td><td class="type">uuid</td><td></td></tr>
+          <tr><td class="field">user_id</td><td class="type">uuid → users</td><td>FK</td></tr>
+          <tr><td class="field">version</td><td class="type">int</td><td>increment on each save</td></tr>
+          <tr><td class="field">is_active</td><td class="type">bool</td><td>current version flag</td></tr>
+          <tr><td class="field">data</td><td class="type">jsonb</td><td>full voiceGuide object — matches AppContext shape</td></tr>
+          <tr><td class="field">created_at</td><td class="type">timestamp</td><td></td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">posts</div>
+        <table class="table">
+          <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+          <tr><td class="field">id</td><td class="type">uuid</td><td></td></tr>
+          <tr><td class="field">user_id</td><td class="type">uuid → users</td><td></td></tr>
+          <tr><td class="field">status</td><td class="type">text</td><td>pending|approved|scheduled|published|discarded</td></tr>
+          <tr><td class="field">bucket</td><td class="type">text</td><td></td></tr>
+          <tr><td class="field">platform</td><td class="type">text</td><td>AI-suggested primary</td></tr>
+          <tr><td class="field">platforms</td><td class="type">text[]</td><td>user-selected for scheduling</td></tr>
+          <tr><td class="field">format</td><td class="type">text</td><td>image | video | reel</td></tr>
+          <tr><td class="field">caption</td><td class="type">text</td><td></td></tr>
+          <tr><td class="field">pull_quote</td><td class="type">text</td><td></td></tr>
+          <tr><td class="field">visual_brief</td><td class="type">text</td><td>for Nano Banana / Veo 3</td></tr>
+          <tr><td class="field">media_url</td><td class="type">text</td><td>R2 CDN URL after generation</td></tr>
+          <tr><td class="field">scheduled_day</td><td class="type">text</td><td></td></tr>
+          <tr><td class="field">scheduled_at</td><td class="type">timestamptz</td><td>resolved UTC datetime</td></tr>
+          <tr><td class="field">ghl_post_id</td><td class="type">text</td><td>from GHL after push</td></tr>
+        </table>
+      </div>
+      <div class="card">
+        <div class="card-title">assets + generation_log</div>
+        <div class="card-title" style="font-size:12px;margin-top:0;margin-bottom:6px;color:var(--muted);">assets</div>
+        <table class="table" style="margin-bottom:16px;">
+          <tr><th>Field</th><th>Type</th><th>Notes</th></tr>
+          <tr><td class="field">id</td><td class="type">uuid</td><td></td></tr>
+          <tr><td class="field">user_id</td><td class="type">uuid → users</td><td></td></tr>
+          <tr><td class="field">type</td><td class="type">text</td><td>Logo|Face|Mascot|Style Ref|Product</td></tr>
+          <tr><td class="field">label</td><td class="type">text</td><td></td></tr>
+          <tr><td class="field">usage_note</td><td class="type">text</td><td>sent to Claude in manifest</td></tr>
+          <tr><td class="field">r2_url</td><td class="type">text</td><td>CDN URL (replaces base64 dataUrl)</td></tr>
+        </table>
+        <div class="card-title" style="font-size:12px;margin-bottom:6px;color:var(--muted);">generation_log</div>
+        <table class="table">
+          <tr><th>Field</th><th>Type</th></tr>
+          <tr><td class="field">user_id</td><td class="type">uuid</td></tr>
+          <tr><td class="field">model</td><td class="type">text</td></tr>
+          <tr><td class="field">tokens_in</td><td class="type">int</td></tr>
+          <tr><td class="field">tokens_out</td><td class="type">int</td></tr>
+          <tr><td class="field">cost_usd</td><td class="type">numeric</td></tr>
+          <tr><td class="field">created_at</td><td class="type">timestamp</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+
+  <!-- ══════════════════════════════════════════════════════
+       ENV VARS MASTER LIST
+  ══════════════════════════════════════════════════════ -->
+  <div class="section">
+    <div class="section-title">All environment variables</div>
+    <div class="grid-2">
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;">FRONTEND (.env)</div>
+        <div class="env-box">
+          <div class="env-line"><span class="env-comment"># Already in repo — demo only, move to server</span></div>
+          <div class="env-line"><span class="env-key">VITE_ANTHROPIC_API_KEY</span>=<span class="env-val">sk-ant-...</span></div>
+          <div class="env-line" style="margin-top:8px;"><span class="env-comment"># Add these</span></div>
+          <div class="env-line"><span class="env-key">VITE_SUPABASE_URL</span>=<span class="env-val">https://xxx.supabase.co</span></div>
+          <div class="env-line"><span class="env-key">VITE_SUPABASE_ANON_KEY</span>=<span class="env-val">eyJ...</span></div>
+        </div>
+      </div>
+      <div>
+        <div style="font-size:12px;font-weight:600;color:var(--muted);margin-bottom:8px;">BACKEND (Vercel / server env)</div>
+        <div class="env-box">
+          <div class="env-line"><span class="env-comment"># AI models</span></div>
+          <div class="env-line"><span class="env-key">ANTHROPIC_API_KEY</span>=<span class="env-val">sk-ant-...</span></div>
+          <div class="env-line"><span class="env-key">GOOGLE_AI_API_KEY</span>=<span class="env-val">AIza...</span></div>
+          <div class="env-line" style="margin-top:6px;"><span class="env-comment"># Storage</span></div>
+          <div class="env-line"><span class="env-key">R2_ACCOUNT_ID</span>=<span class="env-val">...</span></div>
+          <div class="env-line"><span class="env-key">R2_ACCESS_KEY_ID</span>=<span class="env-val">...</span></div>
+          <div class="env-line"><span class="env-key">R2_SECRET_ACCESS_KEY</span>=<span class="env-val">...</span></div>
+          <div class="env-line" style="margin-top:6px;"><span class="env-comment"># GHL</span></div>
+          <div class="env-line"><span class="env-key">GHL_CLIENT_ID</span>=<span class="env-val">...</span></div>
+          <div class="env-line"><span class="env-key">GHL_CLIENT_SECRET</span>=<span class="env-val">...</span></div>
+          <div class="env-line" style="margin-top:6px;"><span class="env-comment"># Billing</span></div>
+          <div class="env-line"><span class="env-key">STRIPE_SECRET_KEY</span>=<span class="env-val">sk_live_...</span></div>
+          <div class="env-line"><span class="env-key">STRIPE_WEBHOOK_SECRET</span>=<span class="env-val">whsec_...</span></div>
+          <div class="env-line" style="margin-top:6px;"><span class="env-comment"># Database</span></div>
+          <div class="env-line"><span class="env-key">SUPABASE_SERVICE_KEY</span>=<span class="env-val">eyJ...</span> <span class="env-comment"># server only</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- FOOTER NOTE -->
+  <div class="card-dark" style="text-align:center;padding:28px;margin-top:16px;">
+    <p style="color:rgba(255,255,255,0.5);font-size:13px;">
+      Frontend repo: <span style="color:#C8A0FF;font-family:'JetBrains Mono',monospace;font-size:12px;">github.com/shevanTIP/act-app-powered-by-cs</span>
+      &nbsp;·&nbsp; Run locally: <span style="color:#C8A0FF;font-family:'JetBrains Mono',monospace;font-size:12px;">npm run dev</span>
+      &nbsp;·&nbsp; Architecture flowchart: <span style="color:#C8A0FF;font-family:'JetBrains Mono',monospace;font-size:12px;">/architecture.html</span>
+    </p>
+  </div>
+
+</div><!-- end page-body -->
+</body>
+</html>
